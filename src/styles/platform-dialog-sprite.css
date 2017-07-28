@@ -1,0 +1,4 @@
+.icon-error { display: inline-block; width: 64px; height: 64px; background-image: url(../images/common-platform-dialog-sprite.png); background-position: 0px 0px; }
+.icon-popup-close-white { display: inline-block; width: 16px; height: 16px; background-image: url(../images/common-platform-dialog-sprite.png); background-position: -64px -64px; }
+.icon-success { display: inline-block; width: 64px; height: 64px; background-image: url(../images/common-platform-dialog-sprite.png); background-position: -64px 0px; }
+.icon-warn { display: inline-block; width: 64px; height: 64px; background-image: url(../images/common-platform-dialog-sprite.png); background-position: 0px -64px; }

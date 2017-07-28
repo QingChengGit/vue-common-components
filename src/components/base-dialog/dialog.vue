@@ -32,7 +32,7 @@
             left: 50%;
             top: 50%;
             z-index: 10000;
-            border: 1px solid #c2c2c2;
+            border: 1px solid #1AB394;
             -webkit-border-radius: 5px;
             -moz-border-radius: 5px;
             border-radius: 5px;
@@ -47,8 +47,8 @@
                 line-height: 40px;
                 padding-left: 14px;
                 font-size: 12px;
-                color: #333;
-                background-color: #c2c2c2;
+                color: #fff;
+                background-color: #1AB394;
             }
             .dialog-close {
                 position: absolute;

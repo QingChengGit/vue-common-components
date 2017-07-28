@@ -1,0 +1,8 @@
+.icon-drag-down { display: inline-block; width: 17px; height: 11px; background-image: url(../images/common-frame-work-sprite.png); background-position: 0px -32px; }
+.icon-exit { display: inline-block; width: 20px; height: 17px; background-image: url(../images/common-frame-work-sprite.png); background-position: 0px 0px; }
+.icon-export { display: inline-block; width: 17px; height: 14px; background-image: url(../images/common-frame-work-sprite.png); background-position: -40px -16px; }
+.icon-message { display: inline-block; width: 17px; height: 16px; background-image: url(../images/common-frame-work-sprite.png); background-position: -40px 0px; }
+.icon-package { display: inline-block; width: 20px; height: 15px; background-image: url(../images/common-frame-work-sprite.png); background-position: 0px -17px; }
+.icon-paypal { display: inline-block; width: 20px; height: 16px; background-image: url(../images/common-frame-work-sprite.png); background-position: -20px 0px; }
+.icon-right-arrow { display: inline-block; width: 5px; height: 10px; background-image: url(../images/common-frame-work-sprite.png); background-position: -17px -32px; }
+.icon-sim-card { display: inline-block; width: 20px; height: 12px; background-image: url(../images/common-frame-work-sprite.png); background-position: -20px -17px; }

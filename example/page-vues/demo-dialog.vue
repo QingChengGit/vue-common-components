@@ -3,6 +3,7 @@
         <div class="yunnex-btn green-btn" @click="showAlertDialog">Alert框</div>
         <div class="yunnex-btn green-btn" @click="showConfirmDialog">Confirm框</div>
         <div class="yunnex-btn green-btn" @click="showAutoCloseDialog">AutoClose框</div>
+        <div class="yunnex-btn green-btn" @click="showMsgBoxDialog">MsgBox框</div>
         <yunnex-dialog :dialog-conf="conf" @close="closeDialogHandle"></yunnex-dialog>
     </div>
 </template>
@@ -62,6 +63,21 @@
                     dialogMessage: '我是一个自动关闭对话框的提示消息!',
                     dialogIcon: 'icon-success'
                 });
+            },
+            showMsgBoxDialog: function() {
+                var self = this,
+                    config = {
+                    dialogType: 'msgBox',
+                    dialogMessage: '我是一个不能手动、自动关闭只能通过程序来关闭的对话框!',
+                    dialogIcon: 'icon-success'
+                };
+
+                openDialog(this, config);
+                setTimeout(function() {
+                    //关闭窗口
+                    config.isShow = false;
+                    self.conf = config;
+                }, 2000);
             },
             closeDialogHandle: function(flag) {
                 //对话框关闭的时候触发的回调，如果点击了对话框的确定按钮则flag值为true

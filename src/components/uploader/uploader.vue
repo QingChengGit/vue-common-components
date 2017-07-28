@@ -83,15 +83,15 @@
             }
         },
         watch: {
-            auto: function(val, oldVal) {
-                if(val && this.curFiles[0]) {
-                    this.$refs.upload.active = true
+            'uploadConfig.isStartUpload': function(val, oldVal) {
+                if(val && this.curFiles[0] && !this.curFiles[0].error && !this.auto) {
+                    this.$refs.upload.update(this.curFiles[0], {active: true});
                 }
             }
         },
         methods: {
             input: function(files) {
-                if(!files[0].active && (files[0].success || files[0].error)) {
+                if(!files[0].active && (!files[0].success || files[0].error)) {
                     this.$emit('file-input', files[0]);
                     if(files[0].error) {
                         //阻止上传
@@ -112,6 +112,7 @@
                         res = oldFile.response;
                     }
                     this.$emit('upload-complete', res, oldFile);
+                    this.auto && (this.uploadConfig.isStartUpload = false);
                 }
             }
         },

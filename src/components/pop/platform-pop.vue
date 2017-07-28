@@ -8,12 +8,12 @@
 </template>
 
 <style lang="less">
-    .pop-title {
+    /*.pop-title {
         padding: 12px 0 12px 10px;
         font-size: 12px;
         color: #fff;
         background-color: #1ab394;
-    }
+    }*/
 </style>
 
 <script>
@@ -27,7 +27,7 @@
             }
         },
         created: function() {
-            this.dialogConfig.titleClass = 'pop-title';
+            //this.dialogConfig.titleClass = 'pop-title';
             this.dialogConfig.closeClass = 'icon-popup-close-white';
         },
         components: {

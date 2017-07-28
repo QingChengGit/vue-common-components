@@ -10,7 +10,6 @@
         margin-top: 20px;
         .yunnex-btn {
             width: 60px;
-            height: 40px;
             border-width: 1px;
             -webkit-border-radius: 4px;
             -moz-border-radius: 4px;

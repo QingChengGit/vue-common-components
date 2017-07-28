@@ -2,9 +2,9 @@
     <dialog :dialog-config="innerConf" @base-dialog-closing="dialogCloseHand">
         <!-- 对话框内容区 -->
         <div class="dialog-content-wrap" slot="dialog-content">
-            <i :class="innerConf.dialogIcon" class="dialog-icon" v-if="innerConf.dialogIcon"></i>
+            <i :class="innerConf.dialogIcon" class="dialog-icon" v-show="innerConf.dialogIcon"></i>
             <p class="dialog-message">{{innerConf.dialogMessage}}</p>
-            <div class="dialog-btn-area" v-show="innerConf.dialogType!=='autoClose'">
+            <div class="dialog-btn-area" v-show="innerConf.dialogType!=='autoClose' && innerConf.dialogType !== 'msgBox'">
                 <div class="btn" :class="ensureBtnClass" ok-btn>{{innerConf.okBtnText}}</div>
                 <div class="btn" cancel-btn v-show="/.*Confirm/.test(innerConf.dialogType)">{{innerConf.cancelBtnText}}</div>
             </div>
@@ -43,8 +43,8 @@
         background-color: #fff;
         text-align: center;
         cursor: pointer;
-        &:first-child {
-            margin-right: 16px;
+        &:last-child {
+            margin-left: 16px;
         }
     }
     .alert-btn, .confirm-btn {
@@ -62,7 +62,8 @@
 
 <script>
     var dialog = require('../base-dialog/index'),
-        util = require('common/js/util');
+        util = require('common/js/util'),
+        spriteCss = require('common/styles/platform-dialog-sprite.css');
 
     module.exports = {
         data: function() {
@@ -74,7 +75,7 @@
         props: {
             /*
              dialogConf: {
-                dialogType: string [.*Alert|.*Confirm|autoClose]任意一种,
+                dialogType: string [.*Alert|.*Confirm|autoClose|msgBox]任意一种,
                 dialogMessage: string, 可选
                 //对话框上显示的图标class。比如显示一个成功、失败、错误的图标
                 dialogIcon: string, 可选
@@ -100,6 +101,7 @@
                 rs = util.clone(this.dialogConf);
                 rs.okBtnText = rs.okBtnText || '确定';
                 rs.cancelBtnText = rs.cancelBtnText || '取消';
+                rs.dialogType === 'msgBox' && (rs.closeClass = '');
                 if(!!this.hideFlag) {
                     rs.isShow = false;
                     this.hideFlag = 0;
