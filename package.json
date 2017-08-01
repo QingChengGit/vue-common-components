@@ -1,0 +1,49 @@
+{
+  "name": "vue-demo",
+  "version": "2.0.0",
+  "description": "项目中js代码使用CommonJs样式。不断学习探索中。 #Webpack学习的一些链接 webpack入门指南 http://www.w2bc.com/Article/50764",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "webpack",
+    "production": "webpack -p",
+    "publish": "npm run production || bash generate_changed_files.sh"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/QingChengGit/Vue-Webpack-Exmaple.git"
+  },
+  "keywords": [
+    "vue",
+    "webpack"
+  ],
+  "author": "qingCheng",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/QingChengGit/Vue-Webpack-Exmaple/issues"
+  },
+  "homepage": "https://github.com/QingChengGit/Vue-Webpack-Exmaple#readme",
+  "devDependencies": {
+    "clean-webpack-plugin": "^0.1.16",
+    "copy-webpack-plugin": "^4.0.1",
+    "css-loader": "^0.28.1",
+    "extract-loader": "^0.1.0",
+    "extract-text-webpack-plugin": "^2.1.0",
+    "file-loader": "^0.11.2",
+    "html-loader": "^0.4.5",
+    "html-webpack-plugin": "^2.28.0",
+    "less-loader": "^4.0.3",
+    "loader-utils": "^1.1.0",
+    "purify-css": "^1.2.5",
+    "purifycss-webpack": "^0.7.0",
+    "vue": "^2.3.3",
+    "vue-loader": "^12.0.4",
+    "vue-template-compiler": "^2.3.3",
+    "webpack": "^2.5.1",
+    "webpack-spritesmith": "^0.3.3"
+  },
+  "dependencies": {
+    "less": "^2.7.2",
+    "style-loader": "^0.17.0"
+  }
+}
