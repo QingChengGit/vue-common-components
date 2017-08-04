@@ -34,6 +34,10 @@
         data: function() {
             var self = this;
             return {
+                /*
+                    当表格单元格需要调用render来渲染最终输出内容时，请使用vue的render函数来创建输出内容。
+                    render函数用法参考：https://cn.vuejs.org/v2/guide/render-function.html
+                 */
                 titles: [
                     {
                         name: 'appName',

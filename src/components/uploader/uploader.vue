@@ -5,7 +5,8 @@
     </div>-->
     <div class="yunnex-uploader-component">
         <file-uploader :post-action="uploadConfig.backendUrl" :accept="accept" :extensions="fileExtensions"
-        :size="fileMaxSize" :timeout="timeout" @input-file="inputFile" @input="input" ref="upload" v-model="curFiles">
+        :size="fileMaxSize" :timeout="timeout" @input-file="inputFile" @input="input" ref="upload"
+        :data="uploadConfig.data" v-model="curFiles">
             <span class="upload-btn-text">{{uploadConfig.btnText || '上传图片'}}</span>
         </file-uploader>
     </div>

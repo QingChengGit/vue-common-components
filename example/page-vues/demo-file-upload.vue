@@ -106,6 +106,30 @@
                 },
                 uploadLogoName: '',
                 uploadCoverName: '',
+                /*
+                    文件上传组件可选项配置对象:
+                    {
+                        //设置在选择要上传文件后是否自动上传文件
+                        auto: boolean， 可选
+                        //设置文件上传的后端接口地址
+                        backendUrl: string, 必填
+                        //多个扩展名之间以逗号隔开比如'png,jpg',默认为'jpg,jpeg,bmp,png'
+                        fileExtensions: string, 可选
+                        //可上传文件类型对应的mimeType，默认为：'image/gif,image/jpg,image/jpeg,image/bmp,image/png'
+                        accepts: string, 可选
+                        //上传文件的最大空间，默认10M
+                        maxSize: number, 可选
+                        //设置文件上传超时时间，默认60秒
+                        timeout: number， 单位毫秒 可选
+                        //这个配置主要用在手动开始上传情况下，在手动上传的情况下单设置此属性为true时则开始上传文件。
+                        //配置对象设置了auto: true时，此设置无效
+                        isStartUpload: boolean, 可选
+                        //上传文件按钮的文本，默认为‘上传图片’
+                        btnText: string, 可选,
+                        //传递给后端接口的参数对象
+                        data: object, 可选
+                    }
+                 */
                 logoFileUploaderConfig: {
                     maxSize: 1024 * 1024,
                     backendUrl: uploadBackendUrl,

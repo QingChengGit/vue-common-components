@@ -33,6 +33,17 @@
             return {
                 userName: 'tom',
                 inputName: '',
+                /*
+                    设置pop弹框的配置选项对象
+                    {
+                        //弹出框标题，默认为“提示”
+                        title: string, 可选
+                        //通过控制isShow的值来控制弹出框的关闭、打开。dialog也一样
+                        isShow: boolean, 必填
+                        //弹出框关闭按钮图标样式class
+                        closeClass: string, 可选
+                    }
+                 */
                 config: {
                     title: '修改用户姓名',
                     isShow: false

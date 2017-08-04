@@ -29,6 +29,23 @@
     module.exports = {
         data: function() {
             return {
+                /*
+                     对话框配置对象选项
+                     dialogConf: {
+                     dialogType: string [.*Alert|.*Confirm|autoClose|msgBox]任意一种, 必填
+                     dialogMessage: string, 可选
+                     //对话框上显示的图标class。比如显示一个成功、失败、错误的图标
+                     dialogIcon: string, 可选
+                     //对话框窗右上角关闭按钮的class，如果不设置该选型则对话框右上角无关闭按钮
+                     closeClass: string, 可选
+                     okBtnText: string  默认为：确定,
+                     cancelBtnText: string  默认为：取消,
+                     //控制对话框的显示、关闭
+                     isShow: boolean, 必填
+                     //delayTime,对话框自动关闭的延时时间，如果对话框类型为autoClose才有效
+                     delayTime: number, 默认为2000毫秒
+                 }
+                 */
                 conf: {
                     dialogType: '',
                     dialogMessage: '',
