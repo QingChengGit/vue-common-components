@@ -119,6 +119,10 @@
         methods: {
             dialogCloseHand: function(flag) {
                 //对话框关闭的时候触发的回调，如果点击了对话框的确定按钮则flag值为true
+                if(this.innerConf.dialogCloseCb) {
+                    this.innerConf.dialogCloseCb(flag);
+                }
+                this.hideFlag = (this.hideFlag + 1) % 2;
                 this.$emit('close', flag);
             }
         },

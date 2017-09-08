@@ -1,9 +1,9 @@
 /**
- * Created by liuxinxin on 2017/5/22.
+ * Created by liuxinxin on 2017/8/9.
  */
 var Vue = require('vue'),
     VueResource = require('vue-resource'),
-    page = require('../page-vues/demo-pop'),
+    page = require('../page-vues/demo-cr-box'),
     frame = require('common/components/frame-work/index');
 
 Vue.use(VueResource);

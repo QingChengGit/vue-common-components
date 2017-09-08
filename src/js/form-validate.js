@@ -47,7 +47,7 @@ FormValidate.prototype.init = function init(el) {
                     return "value" in element ? element.value : element.getAttribute('data-value');
                 };
             })(item),
-            message: item.getAttribute('message').split(';')
+            message: item.getAttribute('validate-message').split(';')
         });
     });
 };

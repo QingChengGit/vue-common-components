@@ -1,16 +1,18 @@
-/**
- * Created by liuxinxin on 2017/5/22.
- */
+// import Vue from 'vue';
+
+
 var Vue = require('vue'),
     VueResource = require('vue-resource'),
-    page = require('../page-vues/demo-pop'),
+    page = require('../page-vues/demo-page'),
     frame = require('common/components/frame-work/index');
 
 Vue.use(VueResource);
-var t = new Vue({
+Vue.http.options.jsonp = 'jsonpcallback';
+
+new Vue({
     el: '#app',
     components: {
         app: page,
         'frameWork': frame
     }
-});
+})

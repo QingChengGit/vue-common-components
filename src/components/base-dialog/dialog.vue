@@ -63,6 +63,7 @@
             }
             .yunnex-dialog-content {
                 min-width: 400px;
+                min-height: 100px;
                 background-color: #fff;
                 text-align: center;
                 &:after {

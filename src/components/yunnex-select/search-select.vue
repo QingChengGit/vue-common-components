@@ -11,8 +11,9 @@
         <ul class="option-container" @click="selectItem">
             <li class="option-item" :class="{'option-item-selected': selectedItem &&
                 selectedItem[selectTitle.name] === item[selectTitle.name]}" v-for="item in selectData"
-                :option-id="item.id">{{item[selectTitle.text]}}</li>
+                :option-id="item[selectTitle.name]">{{item[selectTitle.text]}}</li>
         </ul>
+        <div v-show="false" :data-tmp="setSelectedItem"></div>
     </div>
 </div>
 </template>
@@ -23,6 +24,7 @@
     display: inline-block;
     width: 220px;
     font-size: 14px;
+    vertical-align: middle;
     .selected-text {
         position: relative;
         height: 30px;
@@ -87,6 +89,8 @@
 </style>
 
 <script>
+    var sprite = require('common/styles/yunnex-select-sprite.css');
+
     module.exports = {
         data: function() {
             return {
@@ -137,24 +141,26 @@
             },
             selectItem: function(evt) {
                 var target = evt.target,
-                    id = target.getAttribute('option-id'),
+                    id,
                     self = this;
 
-                if(self.disabled) {
+                if(self.disabled || !target.hasAttribute('option-id')) {
                     return;
                 }
-                if(id) {
-                    self.selectData.some(function(item, index) {
-                        if(item[self.selectTitle.name] == id){
-                            self.selectedItem = item;
-                            self.$emit('input', item[self.selectTitle.name]);
-                            self.$emit('select-change', item);
-                            return true;
-                        }
-                    });
-                    self.searchText = '';
-                }
+                self.searchText = '';
                 self.isActive = false;
+                id = target.getAttribute('option-id');
+                if(self.selectedItem && self.selectedItem[self.selectTitle.name] == id) {
+                    return;
+                }
+                self.selectData.some(function(item, index) {
+                    if(item[self.selectTitle.name] == id){
+                        self.selectedItem = item;
+                        self.$emit('input', item[self.selectTitle.name]);
+                        self.$emit('select-change', item);
+                        return true;
+                    }
+                });
             },
             clickSelector: function() {
                 if(this.disabled) {
@@ -171,13 +177,15 @@
                 }
             }
         },
-        watch: {
-            sourceData: function(newVal, oldVal) {
+        computed: {
+            setSelectedItem: function() {
                 var self = this;
 
-                newVal.some(function(item) {
+                self.sourceData.some(function(item) {
                     if(item.selected) {
                         self.selectedItem = item;
+                        self.$emit('input', item[self.selectTitle.name]);
+                        //self.$emit('select-change', item);
                         return true;
                     }
                 });

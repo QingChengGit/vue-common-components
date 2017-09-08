@@ -318,7 +318,8 @@
             col,
             sibling;
 
-        if((' ' + targetDom.className + ' ').indexOf(' ' + classIdentifier + ' ') === -1 || (' ' + targetDom.className + ' ').indexOf(' disabled ') > -1) {
+        if((' ' + targetDom.className + ' ').indexOf(' ' + classIdentifier + ' ') === -1 ||
+            (' ' + targetDom.className + ' ').indexOf(' disabled ') > -1) {
             return;
         }
         row = col = 0;
@@ -560,7 +561,7 @@
             document.body.addEventListener('click', this.closeDatePicker, false);
             picker.style.top = this.$el.querySelector('.selected-date-text').clientHeight + 6 + 'px';
         },
-        beforeDestory: function() {
+        beforeDestroy: function() {
             document.body.removeEventListener('click', this.closeDatePicker, false);
         }
     };

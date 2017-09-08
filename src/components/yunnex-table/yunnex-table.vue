@@ -14,7 +14,7 @@
             </tr>
             </thead>
             <tbody>
-            <tr class="yunnex-table-tr" v-for="(item, index) in tableData">
+            <tr class="yunnex-table-tr" v-for="(item, index) in tableData" :key="item[forKey]">
                 <td v-for="(t, idx) in tableTitles">
                     <div class="yunnex-cell-wrap" v-if="t.render">
                         <expand-cell :render="t.render" :data="item[t.name]" :row="item"
@@ -75,7 +75,11 @@
             tableData: {
                 type: Array,
                 required: true
-            }/*,
+            },
+            forKey: {
+                type: String
+            }
+            /*,
             isShowPagination: {
                 type: Boolean,
                 default: false

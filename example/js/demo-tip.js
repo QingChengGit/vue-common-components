@@ -1,16 +1,14 @@
 /**
- * Created by liuxinxin on 2017/5/22.
+ * Created by xw on 2017/8/10.
  */
 var Vue = require('vue'),
-    VueResource = require('vue-resource'),
-    page = require('../page-vues/demo-pop'),
+    tip = require('../page-vues/demo-tip'),
     frame = require('common/components/frame-work/index');
 
-Vue.use(VueResource);
 var t = new Vue({
     el: '#app',
     components: {
-        app: page,
+        app: tip,
         'frameWork': frame
     }
 });
