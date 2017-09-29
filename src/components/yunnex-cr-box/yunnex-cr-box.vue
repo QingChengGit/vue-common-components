@@ -53,7 +53,7 @@
 </style>
 
 <script>
-    var sprite = require('./yunnex-cr-box-sprite.css');
+    var sprite = require('common/styles/yunnex-cr-box-sprite.css');
 
     module.exports = {
         data: function() {

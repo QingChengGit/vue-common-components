@@ -72,9 +72,11 @@
         overflow-y: scroll;
     }
     .option-item {
-        height: 30px;
+        min-height: 30px;
         line-height: 30px;
         padding: 0 10px;
+        word-wrap: break-word;
+        white-space: normal;
         cursor: pointer;
         &:hover {
             color: #fff;
@@ -157,7 +159,7 @@
                     if(item[self.selectTitle.name] == id){
                         self.selectedItem = item;
                         self.$emit('input', item[self.selectTitle.name]);
-                        self.$emit('select-change', item);
+                        self.$emit('select-change', item, index);
                         return true;
                     }
                 });
@@ -173,6 +175,7 @@
                 var target = evt.target;
 
                 if(!this.$el.contains(target)) {
+                    this.searchText = '';
                     this.isActive = false;
                 }
             }

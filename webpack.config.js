@@ -7,7 +7,7 @@ var path = require('path'),
     root = path.resolve('../frontend'),
     commonDir = root + '/common',
     //指定要打包的子项目目录。比如如果需要对login子项目打包就把demo改成login
-    dir = root + '/saofu-shop-card/src',
+    dir = root + '/advertise-web-admin/src',
     fs = require('fs'),
     entries = {},
     webpack = require('webpack'),
@@ -17,17 +17,16 @@ var path = require('path'),
     SpritesmithPlugin = require('webpack-spritesmith'),
     CleanWebpackPlugin = require('clean-webpack-plugin'),
     CopyWebpackPlugin = require('copy-webpack-plugin'),
-    PurifyCSSPlugin = require('purifycss-webpack'),
     //自动注入ctx的插件
-    //CtxInjectPlugin = require('./ctx-inject'),
+    CtxInjectPlugin = require('./ctx-inject'),
     libName = 'lib',
     entryDirPrefix = dir + '/js/',
     config,
     argv,
-    prevModuleName,
+    prevModuleName = '',
     chunkArr = [],
     commIconsDir = commonDir + '/images/icons/',
-    jsFileNameTemplate = '[name].js',
+    jsFileNameTemplate = '[name].min.js',
     cssFileNameTemplate = '[name].css',
     imgFileNameTemplate = '[name].[ext]';
 
@@ -136,14 +135,11 @@ config = {
                     name: imgFileNameTemplate,
                     useRelativePath: true,
                     publicPath: function (url) {
-                        if (url.indexOf('../') > -1) {
-                            /*
-                                正则表达式为取url的文件名以及文件所在目录，比如url为：'../images/mall/sprite.png'，处
-                                理之后未mall/sprite.png。
-                             */
-                            url = '../../../dist/images/' + url.replace(/.*?([^\/]+\/[^\/]+)$/, '$1');
-                        }
-                        return url;
+                        /*
+                            正则表达式为取url的文件名以及文件所在目录，比如url为：'../images/mall/sprite.png'，处
+                            理之后未mall/sprite.png。
+                        */
+                        return '../../images/' + url.replace(/.*?([^\/]+\/[^\/]+)$/, '$1');;
                     },
                     outputPath: function (url) {
                         return 'images/' + url.replace(/.*?([^\/]+\/[^\/]+)$/, '$1');
@@ -157,7 +153,8 @@ config = {
         extensions: ['.js', '.vue'],
         alias: {
             vue: commonDir + '/js/lib/vue.min.js',
-            'vue-resource': commonDir + '/js/lib/vue-resource.min',
+            jsonp: commonDir + '/js/lib/jsonp.js',
+            axios: commonDir + '/js/lib/axios.min.js',
             common: root + '/common'
         }
     },
@@ -175,11 +172,14 @@ config = {
             filename: function (getPath) {
                 return getPath(cssFileNameTemplate).replace('js', 'css');
             }
-        })
+        }),
         //new CopyWebpackPlugin([{from: dir + '/json', to: dir + '/dist/json'}]),
         //如果需要注入ctx，调用此插件即可
         //new CtxInjectPlugin()
-    ]
+    ],
+    externals: {
+        jquery: 'window.$'
+    }
 };
 //对common/icons目录下的图标生成对应的雪碧图
 fs.readdirSync(commIconsDir).forEach(function (el, index) {
@@ -210,50 +210,22 @@ fs.readdirSync(commIconsDir).forEach(function (el, index) {
         })
     );
 });
-//循环生成入口entries
+//循环生成入口entries和自动输出html
 function generateEntryAndHTMLPlugin (tarDir, moduleName) {
     var reg = /.*?([^\/]+)$/g,
-        _prefix = 'js/' + moduleName + '/';
+        _prefix;
 
+    moduleName = moduleName || '';
+    _prefix = moduleName ? 'js/' + moduleName + '/' : 'js/';
     fs.readdirSync(tarDir).forEach(function (el, index, arr) {
         if (fs.statSync(tarDir + el).isFile()) {
-            chunkArr.push('js/' + prevModuleName + '/' + el.split('.')[0]);
+            chunkArr.push('js/' + prevModuleName + el.split('.')[0]);
             entries[_prefix + el.split('.')[0]] = tarDir + el;
-            /*config.plugins.push(new webpack.optimize.CommonsChunkPlugin({
-                name: ['js/' + moduleName + '/common', 'js/' + moduleName + '/' + libName]
-            }));*/
-            //为不同的模块生成对应的雪碧图
-            config.plugins.push(new SpritesmithPlugin({
-                // 目标小图标
-                src: {
-                    cwd: dir + '/images/icons/' + moduleName + '/',
-                    glob: '*.png'
-                },
-                // 输出雪碧图文件及样式文件
-                target: {
-                    image: dir + '/images/' + moduleName + '/sprite.png',
-                    css: [
-                        [
-                            dir + '/styles/' + moduleName+ '/sprite.css',
-                            {
-                                format: 'function_based_template'
-                            }
-                        ]
-                    ]
-                },
-                // 样式文件中调用雪碧图地址写法
-                apiOptions: {
-                    cssImageRef: '../../images/' + moduleName + '/sprite.png'
-                },
-                customTemplates: {
-                    function_based_template: templateFunction
-                }
-            }));
             config.plugins.push(
                 new HtmlWebpackPlugin({
                     chunks: [_prefix + el.split('.')[0], _prefix + 'common', _prefix + libName],
-                    template: dir + '/' + el.split('.')[0] + '.html',
-                    filename: el.split('.')[0] + '.html',
+                    template: dir + '/html/' + moduleName + '/' + el.split('.')[0] + '.html',
+                    filename: 'html/' + moduleName + '/' + el.split('.')[0] + '.html',
                     xhtml: true,
                     chunksSortMode: function (a, b) {
                         if (b.names[0].replace(reg, '$1') === 'common') {
@@ -266,32 +238,61 @@ function generateEntryAndHTMLPlugin (tarDir, moduleName) {
                     }
                 })
             );
-        }else {
-            entries['js/' + el + '/lib'] = ['vue', 'vue-resource'];
+        }else if(el !== 'lib'){
+            entries['js/' + el + '/lib'] = ['vue', 'axios'];
             if(prevModuleName) {
                 config.plugins.push(new webpack.optimize.CommonsChunkPlugin({
-                    name: ['js/' + prevModuleName + '/' + libName, 'js/' + prevModuleName + '/common'],
+                    name: ['js/' + prevModuleName + libName, 'js/' + prevModuleName + 'common'],
                     chunks: chunkArr.concat(),
                     minChunks: 2
                 }));
             }
-            prevModuleName = el;
+            prevModuleName = el + '/';
             chunkArr = ['js/' + el + '/lib'];
             generateEntryAndHTMLPlugin(entryDirPrefix + el + '/', el);
         }
     });
     //处理最后一个目录的公共chunk的提取
     config.plugins.push(new webpack.optimize.CommonsChunkPlugin({
-        name: ['js/' + prevModuleName + '/' + libName, 'js/' + prevModuleName + '/common'],
+        name: ['js/' + prevModuleName + libName, 'js/' + prevModuleName + 'common'],
         chunks: chunkArr.concat(),
         minChunks: 2
     }));
 }
+function generateSpriteForModule() {
+    fs.readdirSync(dir + '/images/icons/').forEach(function (el, index, arr) {
+        if (fs.statSync(dir + '/images/icons/' + el).isDirectory()) {
+            //为不同的模块生成对应的雪碧图
+            config.plugins.push(new SpritesmithPlugin({
+                // 目标小图标
+                src: {
+                    cwd: dir + '/images/icons/' + el,
+                    glob: '*.png'
+                },
+                // 输出雪碧图文件及样式文件
+                target: {
+                    image: dir + '/images/' + el + '/sprite.png',
+                    css: [
+                        [
+                            dir + '/styles/' + el + '/sprite.css',
+                            {
+                                format: 'function_based_template'
+                            }
+                        ]
+                    ]
+                },
+                // 样式文件中调用雪碧图地址写法
+                apiOptions: {
+                    cssImageRef: '../../images/' + el + '/sprite.png'
+                },
+                customTemplates: {
+                    function_based_template: templateFunction
+                }
+            }));
+        }
+    });
+}
+generateSpriteForModule();
 generateEntryAndHTMLPlugin(entryDirPrefix);
-console.log('==========');
-/*config.plugins.push(new PurifyCSSPlugin({
- // Give paths to parse for rules. These should be absolute!
- paths: glob.sync(path.join(dir,  'dist/js/!*.js'))
- }));*/
 
 module.exports = config;

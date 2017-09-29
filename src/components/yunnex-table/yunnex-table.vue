@@ -35,6 +35,7 @@
 <style lang="less">
     .yunnex-table-component {
         .yunnex-table {
+            width: 100%;
             table-layout: fixed;
             border: 0;
             border-collapse: collapse;

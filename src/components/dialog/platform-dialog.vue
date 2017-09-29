@@ -5,8 +5,8 @@
             <i :class="innerConf.dialogIcon" class="dialog-icon" v-show="innerConf.dialogIcon"></i>
             <p class="dialog-message">{{innerConf.dialogMessage}}</p>
             <div class="dialog-btn-area" v-show="innerConf.dialogType!=='autoClose' && innerConf.dialogType !== 'msgBox'">
-                <div class="btn" :class="ensureBtnClass" ok-btn>{{innerConf.okBtnText}}</div>
-                <div class="btn" cancel-btn v-show="/.*Confirm/.test(innerConf.dialogType)">{{innerConf.cancelBtnText}}</div>
+                <div class="dialog-btn" :class="ensureBtnClass" ok-btn>{{innerConf.okBtnText}}</div>
+                <div class="dialog-btn" cancel-btn v-show="/.*Confirm$/.test(innerConf.dialogType)">{{innerConf.cancelBtnText}}</div>
             </div>
         </div>
     </dialog>
@@ -31,7 +31,7 @@
     .dialog-btn-area {
         margin-top: 24px;
     }
-    .btn {
+    .dialog-btn {
         display: inline-block;
         padding: 10px 16px;
         border: 1px solid #e5e6e7;
@@ -47,14 +47,14 @@
             margin-left: 16px;
         }
     }
-    .alert-btn, .confirm-btn {
+    .alert-btn, .error-btn {
         border: none;
         color: #fff;
     }
     .alert-btn {
         background-color: #F5A64A;
     }
-    .confirm-btn {
+    .error-btn {
         background-color: red;
     }
 }
@@ -111,8 +111,8 @@
             },
             ensureBtnClass: function() {
                 return {
-                    'alert-btn': /^.*Alert/.test(this.dialogConf.dialogType),
-                    'confirm-btn': /^.*Confirm$/.test(this.dialogConf.dialogType)
+                    'alert-btn': /^tip|warn/.test(this.dialogConf.dialogType),
+                    'error-btn': /^error/.test(this.dialogConf.dialogType)
                 };
             }
         },
@@ -134,6 +134,10 @@
                 if(val.dialogType === 'autoClose' && val.isShow) {
                     setTimeout(function() {
                         self.hideFlag = (self.hideFlag + 1) % 2;
+                        if(self.innerConf.dialogCloseCb) {
+                            self.innerConf.dialogCloseCb();
+                        }
+                        self.$emit('close');
                     }, delayTime);
                 }
             }
