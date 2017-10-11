@@ -7,7 +7,7 @@ previous_dir=""
 rs_filename="changed_files"
 
 function init {
-    read -p "输入要进行增量更新的项目根目录路径:" dir;
+    read -p "输入要进行增量更新的项目根目录路径(相对于打包脚本所在路径):" dir;
     scanner_root=$dir;
     if [ ! -d $scanner_root ];then
         echo "$scanner_root is not directory!"
@@ -23,10 +23,10 @@ function generate_changed_file {
     local previous_file="previous"
 	local dir_name
 	local sign="-"
-	local p_index
-	local p_name
-	local c_index
-	local c_name
+	local p_ext
+	local p_file_path
+	local c_ext
+	local c_file_path
 	local modifier_index
     local modifier
 	local flag=0
@@ -36,12 +36,14 @@ function generate_changed_file {
     local j
 	
     >$rs_filename
-    echo "$previous_dir";
-    #generate previous file
-    if [ ! -e $previous_dir ];then
+    echo "previous_file:$previous_file";
+        if [ ! -e $previous_dir ];then
         mkdir $previous_dir
     fi
+    
+    #generate previous file
     find $previous_dir -fprint $previous_file
+    
     previous_file_arr=($(cat $previous_file))
     echo "length:${#previous_file_arr[@]}"
 
@@ -67,20 +69,25 @@ function generate_changed_file {
                 if [ -d $line ];then
                     continue
                 fi
-                p_index=$(expr index $line $sign)
-                p_name=${line:p_index}
-                
-                c_index=$(expr index $file $sign)
-                c_name=${file:c_index}
 
-                if [ "$p_name" == "$c_name" ];then
+                #删除文件路径的前缀
+                p_file_path=${line/$previous_dir/}
+                p_ext=${p_file_path##*.}
+                p_file_path=${p_file_path%$sign*}.$p_ext
+                
+                c_file_path=${file/$scanner_dir/}
+                c_ext=${c_file_path##*.}
+                c_file_path=${c_file_path%$sign*}.$c_ext
+               
+
+                if [ "$p_file_path" == "$c_file_path" ];then
                     flag=1
 
-                    #删除数组中的元素
-                    unset previous_file_arr[$((j-1))]
-
-                    #此处文件路径的比较需要注意下!!
+                   
+                    #此处文件路径的比较需要注意下!!如果文件名不一致即hash值不同说明文件内容发生改变
                     if [ ${file/$scanner_dir/} == ${line/$previous_dir/} ];then
+                         #删除数组中的元素
+                        unset previous_file_arr[$((j-1))]
                         break
                     else
                         echo "modify:"$file >>$rs_filename
@@ -137,16 +144,16 @@ function generate_changed_file {
             if [ $modifier == "delete" ];then
                 continue
             fi
-            dir_name=$(dirname $cfile)
+            #dir_name=$(dirname $cfile)
             #将changed file输出到对应的change目录下
-            dir_name=${dir_name/dist/$changes_dir_name}
+            #dir_name=${dir_name/dist/$changes_dir_name}
             #除去路径前面的modifier(修饰符)
-            dir_name=${dir_name:modifier_index}
+            #dir_name=${dir_name:modifier_index}
 
-            if [ ! -d $dir_name ];then
-                mkdir -p $dir_name
-            fi
-            cp ${cfile:modifier_index} $dir_name
+            #if [ ! -d $dir_name ];then
+            #    mkdir -p $dir_name
+            #fi
+            #cp ${cfile:modifier_index} $dir_name
         done
         if [ $? -eq 0 ];then
             read -p "需要把发生改变的文件增量更新到$previous_dir目录下吗？(如果需要请输入y)" select
@@ -172,7 +179,6 @@ function increment_update {
 
     #backup 需要增量更新的目标目录
     cp -r $previous_dir "${previous_dir}_backup"
-    cp -r $changes_dir/** $previous_dir
    
     #删除目标目录中发生修改的文件的上一个版本文件
     for cfile in $(cat $rs_filename);do
@@ -209,6 +215,7 @@ function increment_update {
 
     if [[ $? == 0 ]];then
         echo "增量更新改变的文件成功!"
+        rm "$rs_filename"
         rm -r "${previous_dir}_backup"
         exit
     fi

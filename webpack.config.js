@@ -7,7 +7,7 @@ var path = require('path'),
     root = path.resolve('../frontend'),
     commonDir = root + '/common',
     //指定要打包的子项目目录。比如如果需要对login子项目打包就把demo改成login
-    dir = root + '/advertise-web-admin/src',
+    dir = root + '/saofu-shop-card/src',
     fs = require('fs'),
     entries = {},
     webpack = require('webpack'),
@@ -32,10 +32,10 @@ var path = require('path'),
 
 try {
     argv = JSON.parse(process.env.npm_config_argv).original;
-    if (argv[1] === 'production') {
-        jsFileNameTemplate = '[chunkhash]-[name].js';
-        cssFileNameTemplate = '[contenthash]-[name].css';
-        imgFileNameTemplate = '[hash]-[name].[ext]';
+    if (argv[1] === 'production' || argv[1] === 'hash') {
+        jsFileNameTemplate = '[name]-[chunkhash].min.js';
+        cssFileNameTemplate = '[name]-[contenthash].css';
+        imgFileNameTemplate = '[name]-[hash].[ext]';
     }
 } catch (ex) {
     argv = process.argv;
@@ -170,6 +170,7 @@ config = {
         //提取css文件
         new ExtractTextPlugin({
             filename: function (getPath) {
+                console.log(getPath(cssFileNameTemplate));
                 return getPath(cssFileNameTemplate).replace('js', 'css');
             }
         }),
