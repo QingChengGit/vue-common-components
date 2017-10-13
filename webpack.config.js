@@ -170,10 +170,13 @@ config = {
         //提取css文件
         new ExtractTextPlugin({
             filename: function (getPath) {
-                console.log(getPath(cssFileNameTemplate));
                 return getPath(cssFileNameTemplate).replace('js', 'css');
             }
         }),
+        //去掉生成的打包脚本中含有依赖文件的文件路径
+        new webpack.LoaderOptionsPlugin({
+            minimize: true
+        })
         //new CopyWebpackPlugin([{from: dir + '/json', to: dir + '/dist/json'}]),
         //如果需要注入ctx，调用此插件即可
         //new CtxInjectPlugin()
