@@ -36,8 +36,7 @@ function generate_changed_file {
     local j
 	
     >$rs_filename
-    echo "previous_file:$previous_file";
-        if [ ! -e $previous_dir ];then
+    if [ ! -e $previous_dir ];then
         mkdir $previous_dir
     fi
     
@@ -55,7 +54,7 @@ function generate_changed_file {
             
             extension_name=$(basename $file)
             extension_name=${extension_name##*.}
-            if [[ "$extension_name" == "html" || "$extension_name" == "json" ]];then
+            if [[ "$extension_name" == "html" || "$extension_name" == "htm" || "$extension_name" == "json" ]];then
                 echo "modify:"$file >>$rs_filename
                 continue
             fi
@@ -91,6 +90,7 @@ function generate_changed_file {
                         break
                     else
                         echo "modify:"$file >>$rs_filename
+                        #echo "delete:"$line >>$rs_filename
                     fi
                     break
                 fi
@@ -109,7 +109,7 @@ function generate_changed_file {
                 if [ ! -d $i ];then
                     extension_name=$(basename $i)
                     extension_name=${extension_name##*.}
-                    if [[ "$extension_name" != "html" && "$extension_name" != "json" ]];then
+                    if [[ "$extension_name" != "html" && "$extension_name" != "htm" && "$extension_name" != "json" ]];then
                         echo "delete:"$i >>$rs_filename
                     fi
                 fi
@@ -133,32 +133,17 @@ function generate_changed_file {
     
     if [ -s $rs_filename ];then
         #清理目录内容
-        rm -r "$changes_dir"
-
+       
         echo "生成change files list成功!修改的文件在$changes_dir目录下"
         echo "change files list如下:"
         cat -n $rs_filename
-        for cfile in $(cat $rs_filename);do
-            modifier_index=$(expr index $cfile ":")
-            modifier=${cfile:0:(modifier_index-1)}
-            if [ $modifier == "delete" ];then
-                continue
-            fi
-            #dir_name=$(dirname $cfile)
-            #将changed file输出到对应的change目录下
-            #dir_name=${dir_name/dist/$changes_dir_name}
-            #除去路径前面的modifier(修饰符)
-            #dir_name=${dir_name:modifier_index}
-
-            #if [ ! -d $dir_name ];then
-            #    mkdir -p $dir_name
-            #fi
-            #cp ${cfile:modifier_index} $dir_name
-        done
+        
         if [ $? -eq 0 ];then
             read -p "需要把发生改变的文件增量更新到$previous_dir目录下吗？(如果需要请输入y)" select
             if [ "$select" == "y" ];then
-                increment_update 
+                increment_update
+                rm -r "$changes_dir"
+
             else
                 exit
             fi
@@ -183,34 +168,24 @@ function increment_update {
     #删除目标目录中发生修改的文件的上一个版本文件
     for cfile in $(cat $rs_filename);do
         modifier_index=$(expr index $cfile ":")
-        
         modifier=${cfile:0:(modifier_index-1)}
-        if [ $modifier == "add" ];then
-            continue
-        elif [ $modifier == "delete" ];then
+        
+        dir_name=$(dirname $cfile)
+        dir_name=${dir_name/src/}
+        dir_name=${dir_name:modifier_index}
+
+        if [ ! -d $dir_name ];then
+            mkdir -p $dir_name
+        fi
+                    
+        if [ $modifier == "delete" ];then
             del_file=${cfile:modifier_index}
             rm $del_file
             continue
-        elif [ $modifier == "modify" ];then
-            base_name=$(basename $cfile)
-            index=$(expr index $base_name "-")
-            base_name=${base_name:index}
-            dir_name=$(dirname $cfile)
-            dir_name=${dir_name/src/}
-
-            #删除目录路径前面的modifier
-            dir_name=${dir_name:modifier_index}
-            
-            file=$(find $dir_name -regex .*$base_name$)
-            if [ $? -eq 0 ];then
-                for f in $file;do
-                    if [ $(basename $f) != $(basename $cfile) ];then
-                        rm $f
-                    fi
-                done
-            fi
-        
         fi
+
+        cp ${cfile:modifier_index} $dir_name
+
     done
 
     if [[ $? == 0 ]];then

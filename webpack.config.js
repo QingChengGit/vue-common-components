@@ -7,7 +7,8 @@ var path = require('path'),
     root = path.resolve('../frontend'),
     commonDir = root + '/common',
     //指定要打包的子项目目录。比如如果需要对login子项目打包就把demo改成login
-    dir = root + '/saofu-shop-card/src',
+    projectName = 'demo',
+    dir = root + '/' + projectName + '/src',
     fs = require('fs'),
     entries = {},
     webpack = require('webpack'),
@@ -17,9 +18,12 @@ var path = require('path'),
     SpritesmithPlugin = require('webpack-spritesmith'),
     CleanWebpackPlugin = require('clean-webpack-plugin'),
     CopyWebpackPlugin = require('copy-webpack-plugin'),
-    //自动注入ctx的插件
-    CtxInjectPlugin = require('./ctx-inject'),
-    libName = 'lib',
+    YunnexHtmlWebpackPlugin = require('./yunnex-html-webpack'),
+    HappyPack = require('happypack'),
+    //指定babel-preset-es2015插件所在路径
+    //es2015 = path.resolve('./node_modules/babel-preset-es2015'),
+    vendorDllManifest = path.resolve("./js/vendor-manifest.json"),
+    dllManifestName = '../../js/dll/' + require('./js/vendor-manifest.json').name.replace('_', '-'),
     entryDirPrefix = dir + '/js/',
     config,
     argv,
@@ -40,7 +44,6 @@ try {
 } catch (ex) {
     argv = process.argv;
 }
-
 function templateFunction(data) {
     //生成雪碧图模板
     var image,
@@ -68,6 +71,7 @@ function templateFunction(data) {
 config = {
     context: dir,
     entry: entries,
+    cache: true,
     output: {
         path: dir + '/dist',
         filename: jsFileNameTemplate
@@ -77,14 +81,17 @@ config = {
         rules: [
             {
                 test: /\.html$/,
-                loader: 'html-loader'
+                loader: 'html-loader',
+                options: {
+                    minimize: false
+                }
             },
             {
                 test: /\.css$/,
                 use: ExtractTextPlugin.extract({
                     use: [
                         {
-                            loader: 'css-loader'
+                            loader: 'css-loader?id=css'
                         }
                     ]
                 })
@@ -94,10 +101,10 @@ config = {
                 use: ExtractTextPlugin.extract({
                     use: [
                         {
-                            loader: 'css-loader'
+                            loader: 'css-loader?id=css'
                         },
                         {
-                            loader: 'less-loader'
+                            loader: 'less-loader?id=less'
                         }
                     ]
                 })
@@ -107,10 +114,10 @@ config = {
                 use: ExtractTextPlugin.extract({
                     use: [
                         {
-                            loader: 'css-loader'
+                            loader: 'css-loader?id=css'
                         },
                         {
-                            loader: 'sass-loader'
+                            loader: 'sass-loader?id=sass'
                         }
                     ]
                 })
@@ -118,33 +125,55 @@ config = {
             {
                 test: /\.js$/,
                 exclude: nodeModulesDir,
-                loader: 'babel-loader'
+                loader: 'babel-loader?id=js&cacheDirectory'/*,
+                query: {
+                    presets: [es2015]
+                }*/
             },
             {
                 test: /\.vue$/,
                 exclude: nodeModulesDir,
-                loader: 'vue-loader',
+                loader: 'vue-loader?id=vue',
                 options: {
                     extractCSS: true
                 }
             },
             {
-                test: /\.(png|jpg|gif|svg|eot|ttf|woff|woff2)$/,
-                loader: 'yunnex-file-loader',
+                test: /\.(png|jpg|gif|jpeg|bmp)$/,
+                loader: 'yunnex-file-loader?id=file',
                 options: {
                     name: imgFileNameTemplate,
                     useRelativePath: true,
                     publicPath: function (url) {
                         /*
-                            正则表达式为取url的文件名以及文件所在目录，比如url为：'../images/mall/sprite.png'，处
-                            理之后未mall/sprite.png。
-                        */
+                         正则表达式为取url的文件名以及文件所在目录，比如url为：'../images/mall/sprite.png'，处
+                         理之后为mall/sprite.png。
+                         */
                         return '../../images/' + url.replace(/.*?([^\/]+\/[^\/]+)$/, '$1');;
                     },
                     outputPath: function (url) {
                         return 'images/' + url.replace(/.*?([^\/]+\/[^\/]+)$/, '$1');
                     }
                 }
+            },
+            {
+                test: /\.(svg|eot|ttf|woff|woff2)$/,
+                loader: 'yunnex-file-loader?id=file',
+                options: {
+                    name: imgFileNameTemplate,
+                    useRelativePath: true,
+                    publicPath: function (url) {
+                        /*
+                         正则表达式为取url的文件名以及文件所在目录，比如url为：'../images/mall/sprite.woff'，处
+                         理之后为mall/sprite.woff。
+                         */
+                        return '../../css/' + url.replace(/.*?([^\/]+\/[^\/]+)$/, '$1');;
+                    },
+                    outputPath: function (url) {
+                        return 'css/' + url.replace(/.*?([^\/]+\/[^\/]+)$/, '$1');
+                    }
+                }
+
             }
         ]
     },
@@ -152,21 +181,58 @@ config = {
         modules: [nodeModulesDir, dir],
         extensions: ['.js', '.vue'],
         alias: {
-            vue: commonDir + '/js/lib/vue.min.js',
+            vue: commonDir + '/js/lib/vue.js',
             jsonp: commonDir + '/js/lib/jsonp.js',
-            axios: commonDir + '/js/lib/axios.min.js',
+            axios: commonDir + '/js/lib/axios.js',
             common: root + '/common'
         }
     },
     resolveLoader: {
-        modules: [__dirname, nodeModulesDir]
+        modules: [nodeModulesDir, __dirname]
     },
     plugins: [
         new CleanWebpackPlugin(['dist/*'], {
             root: dir,
             verbose: true,
-            dry: false
+            dry: false,
+            exclude:  ['*-vendor.js']
         }),
+        new CopyWebpackPlugin([{from: commonDir + '/js/dll', to: dir + '/dist/js/dll'}]),
+        new webpack.DllReferencePlugin({
+            scope: 'libs',
+            manifest: vendorDllManifest
+        }),
+        /*new HappyPack({
+            id: 'js',
+            threads: 4,
+            loaders: [ 'babel-loader' ]
+        }),
+        new HappyPack({
+            id: 'css',
+            threads: 4,
+            loaders: [ 'css-loader']
+        }),
+        new HappyPack({
+            id: 'less',
+            threads: 4,
+            loaders: [ 'less-loader']
+        }),
+        new HappyPack({
+            id: 'sass',
+            threads: 4,
+            loaders: [ 'sass-loader']
+        }),
+        new HappyPack({
+            id: 'vue',
+            threads: 4,
+            //threadPool: happyThreadPool,
+            loaders: [ 'vue-loader']
+        }),
+        new HappyPack({
+            id: 'file',
+            threads: 4,
+            loaders: [ 'yunnex-file-loader']
+        }),*/
         //提取css文件
         new ExtractTextPlugin({
             filename: function (getPath) {
@@ -176,46 +242,50 @@ config = {
         //去掉生成的打包脚本中含有依赖文件的文件路径
         new webpack.LoaderOptionsPlugin({
             minimize: true
+        }),
+        new YunnexHtmlWebpackPlugin({
+            //assetsPrefix: projectName,
+            assetsBeforeAppend: dllManifestName + '.js',
+            isNeedCtx: true
         })
-        //new CopyWebpackPlugin([{from: dir + '/json', to: dir + '/dist/json'}]),
-        //如果需要注入ctx，调用此插件即可
-        //new CtxInjectPlugin()
     ],
     externals: {
         jquery: 'window.$'
     }
 };
-//对common/icons目录下的图标生成对应的雪碧图
-fs.readdirSync(commIconsDir).forEach(function (el, index) {
-    config.plugins.push(
-        new SpritesmithPlugin({
-            src: {
-                cwd: commIconsDir + el,
-                glob: '*.png'
-            },
-            target: {
-                image: commonDir + '/images/common/' + el + '-sprite.png',
-                css: [
-                    [
-                        commonDir + '/styles/' + el + '-sprite.css',
-                        {
-                            format: 'function_based_template'
-                        }
+function genCommSprite() {
+    //对common/icons目录下的图标生成对应的雪碧图
+    fs.readdirSync(commIconsDir).forEach(function (el, index) {
+        config.plugins.splice(1, 0,
+            new SpritesmithPlugin({
+                src: {
+                    cwd: commIconsDir + el,
+                    glob: '*.png'
+                },
+                target: {
+                    image: commonDir + '/images/common/' + el + '-sprite.png',
+                    css: [
+                        [
+                            commonDir + '/styles/' + el + '-sprite.css',
+                            {
+                                format: 'function_based_template'
+                            }
+                        ]
                     ]
-                ]
-            },
-            // 样式文件中调用雪碧图地址写法
-            apiOptions: {
-                cssImageRef: '../images/common/' + el + '-sprite.png'
-            },
-            customTemplates: {
-                function_based_template: templateFunction
-            }
-        })
-    );
-});
-//循环生成入口entries和自动输出html
+                },
+                // 样式文件中调用雪碧图地址写法
+                apiOptions: {
+                    cssImageRef: '../images/common/' + el + '-sprite.png'
+                },
+                customTemplates: {
+                    function_based_template: templateFunction
+                }
+            })
+        );
+    });
+}
 function generateEntryAndHTMLPlugin (tarDir, moduleName) {
+    //循环生成入口entries和自动输出html
     var reg = /.*?([^\/]+)$/g,
         _prefix;
 
@@ -227,15 +297,13 @@ function generateEntryAndHTMLPlugin (tarDir, moduleName) {
             entries[_prefix + el.split('.')[0]] = tarDir + el;
             config.plugins.push(
                 new HtmlWebpackPlugin({
-                    chunks: [_prefix + el.split('.')[0], _prefix + 'common', _prefix + libName],
+                    chunks: [_prefix + el.split('.')[0], _prefix + 'common'],
                     template: dir + '/html/' + moduleName + '/' + el.split('.')[0] + '.html',
-                    filename: 'html/' + moduleName + '/' + el.split('.')[0] + '.html',
+                    filename: 'html/' + moduleName + '/' + el.split('.')[0] + '.htm',
+                    minify: false,
                     xhtml: true,
                     chunksSortMode: function (a, b) {
                         if (b.names[0].replace(reg, '$1') === 'common') {
-                            return 1;
-                        }
-                        if(a.names[0].replace(reg, '$1') !== 'common' && b.names[0].replace(reg, '$1') === libName) {
                             return 1;
                         }
                         return -1;
@@ -243,22 +311,21 @@ function generateEntryAndHTMLPlugin (tarDir, moduleName) {
                 })
             );
         }else if(el !== 'lib'){
-            entries['js/' + el + '/lib'] = ['vue', 'axios'];
             if(prevModuleName) {
                 config.plugins.push(new webpack.optimize.CommonsChunkPlugin({
-                    name: ['js/' + prevModuleName + libName, 'js/' + prevModuleName + 'common'],
+                    name: ['js/' + prevModuleName + 'common'],
                     chunks: chunkArr.concat(),
                     minChunks: 2
                 }));
             }
             prevModuleName = el + '/';
-            chunkArr = ['js/' + el + '/lib'];
+            chunkArr = [];
             generateEntryAndHTMLPlugin(entryDirPrefix + el + '/', el);
         }
     });
     //处理最后一个目录的公共chunk的提取
     config.plugins.push(new webpack.optimize.CommonsChunkPlugin({
-        name: ['js/' + prevModuleName + libName, 'js/' + prevModuleName + 'common'],
+        name: ['js/' + prevModuleName + 'common'],
         chunks: chunkArr.concat(),
         minChunks: 2
     }));
@@ -296,6 +363,11 @@ function generateSpriteForModule() {
         }
     });
 }
+/*
+    如果之前打包时已经构建过common中的雪碧图并且下次打包common中的icon image没有发生改变，
+    则可以注释此函数减少因重复生成雪碧图而浪费打包时间
+ */
+genCommSprite();
 generateSpriteForModule();
 generateEntryAndHTMLPlugin(entryDirPrefix);
 
