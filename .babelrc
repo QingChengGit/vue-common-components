@@ -1,3 +1,4 @@
 {
+  //此处的路径请设置成此babelrc文件相对于打包脚本中的node_modules/babel-preset-es2015目录的相对路径
   "presets": ["../localbuild/node_modules/babel-preset-es2015"]
 }
