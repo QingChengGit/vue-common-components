@@ -4,7 +4,6 @@
 var path = require('path'),
     //指定frontend工程目录路径
     root = path.resolve('../frontend'),
-    //指定要打包的子项目目录。比如如果需要对login子项目打包就把demo改成login
     dir = root + '/common/js/lib/',
     fs = require('fs'),
     webpack = require('webpack'),
@@ -18,7 +17,7 @@ config = {
     },
     output: {
         path: dir + '../dll',
-        filename: '[name]-[chunkhash].js',
+        filename: '[name]-[chunkhash].min.js',
         library: '[name]_[chunkhash]'
     },
     resolve: {

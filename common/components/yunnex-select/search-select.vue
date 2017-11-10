@@ -58,23 +58,25 @@
         top: 30px;
         width: 100%;
         z-index: 1000;
+        padding: 0 10px;
         border: 1px solid #1ab394;
         border-top: none;
         background-color: #fff;
     }
     .search-input {
+        width: 100%;
         height: 30px;
         padding: 0 10px;
-        margin: 6px 10px;
+        margin: 6px 0;
     }
     .option-container {
         height: 150px;
+        margin: 0 -10px;
         overflow-y: scroll;
     }
     .option-item {
-        min-height: 30px;
-        line-height: 30px;
-        padding: 0 10px;
+        line-height: 20px;
+        padding: 5px 10px;
         word-wrap: break-word;
         white-space: normal;
         cursor: pointer;

@@ -206,8 +206,8 @@ config = {
             id: 'js',
             threads: 4,
             loaders: [ 'babel-loader' ]
-        }),
-        new HappyPack({
+        }),*/
+        /*new HappyPack({
             id: 'css',
             threads: 4,
             loaders: [ 'css-loader']
@@ -221,14 +221,14 @@ config = {
             id: 'sass',
             threads: 4,
             loaders: [ 'sass-loader']
-        }),
-        new HappyPack({
+        }),*/
+        /*new HappyPack({
             id: 'vue',
             threads: 4,
             //threadPool: happyThreadPool,
             loaders: [ 'vue-loader']
-        }),
-        new HappyPack({
+        }),*/
+        /*new HappyPack({
             id: 'file',
             threads: 4,
             loaders: [ 'yunnex-file-loader']
@@ -245,7 +245,7 @@ config = {
         }),
         new YunnexHtmlWebpackPlugin({
             //assetsPrefix: projectName,
-            assetsBeforeAppend: dllManifestName + '.js',
+            assetsBeforeAppend: dllManifestName + '.min.js',
             isNeedCtx: true
         })
     ],
@@ -312,6 +312,7 @@ function generateEntryAndHTMLPlugin (tarDir, moduleName) {
             );
         }else if(el !== 'lib'){
             if(prevModuleName) {
+                //如果觉得不需要对子模块代码生成common.min.js则注释此段代码
                 config.plugins.push(new webpack.optimize.CommonsChunkPlugin({
                     name: ['js/' + prevModuleName + 'common'],
                     chunks: chunkArr.concat(),
@@ -323,7 +324,7 @@ function generateEntryAndHTMLPlugin (tarDir, moduleName) {
             generateEntryAndHTMLPlugin(entryDirPrefix + el + '/', el);
         }
     });
-    //处理最后一个目录的公共chunk的提取
+    //处理最后一个目录的公共chunk的提取,如果觉得不需要对子模块代码生成common.min.js则注释此段代码
     config.plugins.push(new webpack.optimize.CommonsChunkPlugin({
         name: ['js/' + prevModuleName + 'common'],
         chunks: chunkArr.concat(),
