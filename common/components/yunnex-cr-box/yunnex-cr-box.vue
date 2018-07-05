@@ -1,36 +1,51 @@
 <template>
     <div class="yunnex-cr-box-component" @click="selectItem">
-        <div class="select-item" v-for="item in config.list" :item-id="item[dataKey]">
-            <i class="select-icon" :class="[isSelected(item) ? activeClass : iconClass]">
+        <div class="select-item" v-for="item in config.list"
+             :class="[config.isBlock ? 'cr-block' : 'cr-inline-block']">
+            <i class="select-icon" :class="[getIconClass(item)]" :item-id="item[dataKey]">
             </i>
-            <span class="select-text">{{item[dataVal]}}</span>
+            <div class="select-text" v-html="item[dataVal]"></div>
         </div>
     </div>
 </template>
 
 <style lang="less">
     .yunnex-cr-box-component {
+        .border-radius (@radius: 4px) {
+            -webkit-border-radius: @radius;
+            -moz-border-radius: @radius;
+            border-radius: @radius;
+        }
         display: inline-block;
         vertical-align: middle;
         .select-item {
-            display: inline-block;
-            margin-right: 20px;
+            margin-right: 40px;
             font-size: 0;
-            vertical-align: middle;
             cursor: pointer;
             &:last-child {
                 margin-right: 0;
             }
+        }
+        .cr-block {
+            display: block;
+            margin-bottom: 12px;
+            &:last-child {
+                margin-bottom: 0;
+            }
+        }
+        .cr-inline-block {
+            display: inline-block;
+            vertical-align: middle;
         }
         .select-icon {
             display: inline-block;
             margin-right: 10px;
             vertical-align: middle;
         }
-        .icon-single-default, .icon-multile-default {
+        .icon-single-default, .icon-multiple-default, .icon-single-default-disabled, .icon-multiple-default-disabled {
             width: 20px;
             height: 20px;
-            border: 2px solid #999;
+            border: 1px solid #d7d7d7;
             font-size: 0;
         }
         .icon-single-default {
@@ -38,12 +53,27 @@
             -moz-border-radius: 10px;
             border-radius: 10px;
         }
-        .icon-multile-default {
-            -webkit-border-radius: 2px;
-            -moz-border-radius: 2px;
-            border-radius: 2px;
+        .icon-single-default-disabled {
+            .border-radius(10px);
+            background-color: #d7d7d7;
+        }
+        .icon-circle-disabled-checked {
+            -webkit-border-radius: 10px;
+            -moz-border-radius: 10px;
+            border-radius: 10px;
+            background-color: #d7d7d7;
+        }
+        .icon-multiple-default {
+            -webkit-border-radius: 4px;
+            -moz-border-radius: 4px;
+            border-radius: 4px;
+        }
+        .icon-multiple-default-disabled {
+            .border-radius;
+            background-color: #d7d7d7;
         }
         .select-text {
+            display: inline-block;
             line-height: 1;
             font-size: 14px;
             color: #666;
@@ -110,7 +140,7 @@
                                 !hasSelected && self.selectedItems.push(el);
                             }
                             self.$emit('input', self.selectedItems);
-                            self.$emit('checked-change', self.selectedItems);
+                            self.$emit('checked-change', self.selectedItems, currentId, !hasSelected);
                             return true;
                         }
                     });
@@ -131,6 +161,15 @@
                 });
 
                 return flag;
+            },
+            getIconClass: function(item) {
+                var flag;
+
+                flag = this.isSelected(item);
+                if(flag) {
+                    return item.disabled ? this.activeDisabledClass : this.activeClass;
+                }
+                return item.disabled ? this.defaultDisabledClass : this.defaultClass;
             },
             initSelectedItems: function() {
                 var self = this;
@@ -153,17 +192,21 @@
             }
         },
         computed: {
-            iconClass: function() {
-                if(this.config.isSingle){
-                    return this.config.iconClass ? this.config.iconClass : 'icon-single-default';
-                }
-                return this.config.iconClass ? this.config.iconClass : 'icon-multile-default';
+            defaultClass: function() {
+                return this.config.iconDefaultClass ? this.config.iconDefaultClass :
+                    this.config.isSingle ? 'icon-single-default' : 'icon-multiple-default';
+            },
+            defaultDisabledClass: function() {
+                return this.config.iconDefaultDisabledClass ? this.config.iconDefaultDisabledClass :
+                    this.config.isSingle ? 'icon-single-default-disabled' : 'icon-multiple-default-disabled';
             },
             activeClass: function() {
-                if(this.config.isSingle){
-                    return this.config.iconActiveClass ? this.config.iconActiveClass : 'icon-circle-green-checked';
-                }
-                return this.config.iconActiveClass ? this.config.iconActiveClass : 'icon-square-green-checked';
+                return this.config.iconActiveClass ? this.config.iconActiveClass :
+                    this.config.isSingle ? 'icon-circle-green-checked' : 'icon-square-green-checked';
+            },
+            activeDisabledClass: function() {
+                return this.config.iconActiveDisabledClass ? this.config.iconActiveDisabledClass :
+                    this.config.isSingle ? 'icon-circle-disabled-checked' : 'icon-square-disabled-checked';
             },
             dataKey: function() {
                 return this.config.propertyMap.key;
@@ -181,7 +224,9 @@
             }
         },
         created: function() {
-            this.initSelectedItems();
+            var self = this;
+
+            self.initSelectedItems();
         }
     };
 </script>

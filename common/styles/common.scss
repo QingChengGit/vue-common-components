@@ -1,0 +1,222 @@
+@charset "UTF-8";
+@import "./reset.css"; 
+@import "./variable";
+//默认按钮样式，其他颜色按钮需要组合此按钮样式，比如一个绿色按钮的话需要引入yunnex-btn green-btn两个样式组合来生成
+.yunnex-btn {
+    display: inline-block;
+    min-width: 74px;
+    height: 34px;
+    line-height: 32px;
+    padding: 0 24px;
+    border: $border;
+    -webkit-border-radius: 4px;
+    -moz-border-radius: 4px;
+    border-radius: 4px;
+    font-size: 13px;
+    color: #666;
+    background-color: #fff;
+    text-align: center;
+    vertical-align: middle;
+    cursor: pointer;
+    &:hover {
+        border-color: $green;
+        color: $green;
+    }
+}
+.green-btn {
+    border: none;
+    border-width: 1px;
+    color: #fff;
+    background-color: $green;
+    &:hover {
+        background-color: #179279;
+    }
+}
+.disabled-btn {
+    color: #fff;
+    background-color: #ccc;
+    cursor: not-allowed;
+    &:hover {
+        color: #fff;
+        background-color: #ccc;
+    }
+}
+//基础input text宽，可以自己定义宽度
+.yunnex-input {
+    height: 34px;
+    padding: 0 16px;
+    border: $border;
+    font-size: 13px;
+    color: #000;
+    outline: none;
+    &:focus {
+        border-color: $green;
+    }
+}
+/* ========输入框默认此三种规格，如有特殊宽度的输入框由产品、设计提供尺寸标注=========*/
+//小宽度的input text框，宽度为242px
+.yunnex-small-input {
+    width: 110px;
+    @extend .yunnex-input;
+}
+//中等宽度的input text框，宽度为242px
+.yunnex-middle-input {
+    width: 242px;
+    @extend .yunnex-input;
+}
+//长的input text框，一般用在表单区域，宽度490px
+.yunnex-large-input {
+    width: 490px;
+    @extend .yunnex-input;
+}
+/* ========输入框默认此三种规格，如有特殊宽度的输入框由产品、设计提供尺寸标注 End =========*/
+.yunnex-textarea {
+    height: 124px;
+    padding: 6px 16px;
+    @extend .yunnex-large-input;
+}
+.title-page {
+    height: 80px;
+    line-height: 80px;
+    padding-left: 40px;
+    margin: 0 -40px;
+    border-bottom: $border;
+    font-size: 16px;
+    color: $green;
+}
+.page-padding {
+    padding: 0 40px;
+}
+//前面带绿色块的副标题
+.subtitle {
+    display: inline-block;
+    height: 20px;
+    line-height: 20px;
+    padding-left: 6px;
+    margin: 40px 0 20px 0;
+    border-left: 6px solid $green;
+    font-size: 16px;
+    color: $color_333;
+}
+//前面带小图标的副标题
+.subtitle-with-icon {
+    display: inline-block;
+    height: 60px;
+    font-size: 0;
+    vertical-align: middle;
+    &:after {
+        content: '';
+        display: inline-block;
+        width: 0;
+        height: 100%;
+        visibility: hidden;
+        vertical-align: middle;
+    }
+    .subtitle-icon, .subtitle-icon-text {
+        display: inline-block;
+        vertical-align: middle;
+    }
+    .subtitle-icon-text {
+        margin-left: 12px;
+        font-size: 16px;
+        font-weight: bold;
+        color: $color_666;
+    }
+}
+//对副标题的说明性文字区域
+.subtitle-desc {
+    display: inline-block;
+    margin-left: 30px;
+    font-size: 13px;
+    color: #999;
+    vertical-align: middle;
+}
+#body-content {
+    background-color: #fff;
+}
+/*
+    垂直居中公共样式，需要将元素内的子元素全部设置为display: inline-block;vertical-align: middle;
+ */
+.vertical-center {
+    &:after {
+        content: '';
+        display: inline-block;
+        width: 0;
+        height: 100%;
+        font-size: 0;
+        visibility: hidden;
+        vertical-align: middle;
+    }
+}
+//输入框占位符文字样式，占位符文字统一在输入框下面
+.placeholder-text {
+    display: block;
+    margin-top: 8px;
+    font-size: 13px;
+    color: $color_999;
+}
+.error-border {
+    border: 1px solid #f04134;
+}
+//用于校验错误文字的样式
+.error-text {
+    display: block;
+    margin-top: 8px;
+    font-size: 13px;
+    color: #f04134;
+}
+//pop弹框中按钮区域的样式，可参照demo-pop.vue页面用法
+.pop-operate-btns {
+    height: 70px;
+    padding-right: 20px;
+    margin: 0 -20px;
+    border-top: $border;
+    font-size: 0;
+    text-align: right;
+    .yunnex-btn {
+        margin-left: 20px;
+        &:first-child {
+            margin-left: 0;
+        }
+    }
+}
+//标签基本样式, .tag样式为基本样式。如果需要背景色的标签，请组合类名。例如 需要红色标签 就加上  tag  tag-red 两个class。
+.tag {
+    display: inline-block;
+    width: max-content;
+    width: -webkit-max-content;
+    width: -moz-max-content;
+    height: 30px;
+    padding: 0 24px;
+    margin: 0 10px;
+    border: $border;
+    border-radius: 15px;
+    font-size: 13px;
+    line-height: 28px;
+    &.tag-red {
+        border-color: #ff0000;
+        color: #fff;
+        background-color: #ff0000;
+    }
+    &.tag-gray {
+        color: #fff;
+        background-color: #d7d7d7;
+    }
+    &.tag-green {
+        border-color: #1ab394;
+        color: #fff;
+        background-color: #1ab394;
+    }
+    &.tag-yellow {
+        border-color: #fdbf1e;
+        color: #fff;
+        background-color: #fdbf1e;
+    }
+    &.tag-blue {
+        border-color: #64bafa;
+        color: #fff;
+        background-color: #64bafa;
+    }
+}
+
+

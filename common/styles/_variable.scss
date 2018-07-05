@@ -1,0 +1,12 @@
+@charset "UTF-8";
+$green: #1ab394;
+$color_333: #333;
+$color_666: #666;
+$color_999: #999;
+//公共边框样式，如果是特殊边框自行设置即可
+$border: 1px solid #d7d7d7;
+@mixin border-radius($radius: 4px) {
+    -webkit-border-radius: $radius;
+    -moz-border-radius: $radius;
+    border-radius: $radius;
+}

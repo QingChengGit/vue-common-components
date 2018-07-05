@@ -2,9 +2,14 @@
  * Created by liuxinxin on 2017/7/3.
  */
 function hasClass(el, className) {
-    var classNames = el.className;
+    var classNames = el.className,
+        reg;
 
-    if(classNames.indexOf(className) > -1){
+    if(!className) {
+        return false;
+    }
+    reg = new RegExp(' ' + className.trim() + ' ', 'g');
+    if(reg.test(' ' + classNames + ' ')){
         return true;
     }
     return false;

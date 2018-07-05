@@ -6,8 +6,8 @@
     <div class="yunnex-uploader-component">
         <file-uploader :post-action="uploadConfig.backendUrl" :accept="accept" :extensions="fileExtensions"
         :size="fileMaxSize" :timeout="timeout" @input-file="inputFile" @input="input" ref="upload"
-        :data="uploadConfig.data" v-model="curFiles">
-            <span class="upload-btn-text">{{uploadConfig.btnText || '上传图片'}}</span>
+        :data="uploadConfig.data" v-model="curFiles" :class="{'green': text}">
+            <span class="upload-btn-text">{{text || btnText}}</span>
         </file-uploader>
     </div>
 </template>
@@ -16,56 +16,67 @@
     .yunnex-uploader-component {
         position: relative;
         display: inline-block;
-        width: 100px;
-        height: 32px;
+        width: 110px;
+        height: 34px;
         line-height: 32px;
-        border: 1px solid #e1e1e1;
+        border: 1px solid #d7d7d7;
         -webkit-border-radius: 4px;
         -moz-border-radius: 4px;
         border-radius: 4px;
-        color: #848484;
+        color: #333;
         text-align: center;
         vertical-align: middle;
         .file-uploads {
             width: 100%;
             height: 100%;
-            font-size: 12px;
+            font-size: 13px;
             cursor: pointer;
+        }
+        .green {
+            color: #fff;
+            background-color: #1ab394;
+            .upload-btn-text {
+                color: #fff;
+            }
+        }
+        .upload-btn-text {
+            font-size: 13px;
+            font-weight: normal;
+            color: #333;
         }
     }
 </style>
 
 <script>
     var FileUploader = require('./vue-upload-component.min'),
-        upload;
+        upload,
+        btnText;
 
     module.exports = {
         data: function() {
             return {
-                curFiles: null
+                curFiles: null,
+                text: ''
             };
         },
         props: {
             uploadConfig: {
                 type: Object,
                 required: true
-            }
+            },
+            value: String
         },
         computed: {
             auto: function() {
                 if(typeof this.uploadConfig.auto !== 'undefined') {
-                    return this.uploadConfig.auto;
+                    return !!this.uploadConfig.auto;
                 }
                 return true;
             },
             fileExtensions: function() {
                 var extensions = 'jpg,jpeg,bmp,png';
 
-                if(this.uploadConfig.fileExtensions) {
-                    extensions = this.fileExtensions;
-                }
-
-                return extensions;
+                return this.uploadConfig.fileExtensions ? this.uploadConfig.fileExtensions.toString() : extensions;
             },
             accept: function() {
                 var accepts = 'image/gif,image/jpg,image/jpeg,image/bmp,image/png';
@@ -81,12 +92,20 @@
             },
             timeout: function() {
                 return this.uploadConfig.timeout > 0 ? this.uploadConfig.timeout : 1000 * 60;
+            },
+            btnText: function() {
+                return this.uploadConfig.btnText || '上传图片';
             }
         },
         watch: {
             'uploadConfig.isStartUpload': function(val, oldVal) {
                 if(val && this.curFiles[0] && !this.curFiles[0].error && !this.auto) {
                     this.$refs.upload.update(this.curFiles[0], {active: true});
+                }
+            },
+            'value': function(val, oldVal) {
+                if(val) {
+                    this.text = '修改图片';
                 }
             }
         },
@@ -106,16 +125,30 @@
                 if (this.auto && !this.$refs.upload.uploaded && !this.$refs.upload.active) {
                     this.$refs.upload.active = true
                 }
-                if(newFile && oldFile && !newFile.active) {
+                if(newFile && oldFile && !newFile.active && newFile.success) {
                     if(typeof oldFile.response === 'string'){
                         res = JSON.parse(oldFile.response);
                     }else {
                         res = oldFile.response;
                     }
                     this.$emit('upload-complete', res, oldFile);
-                    this.auto && (this.uploadConfig.isStartUpload = false);
+                    res._fileName = oldFile.name;
+                    this.$emit('_change', res);
+                    !this.auto && (this.uploadConfig.isStartUpload = false);
+                    this.text = '修改图片';
                 }
+            },
+            clear: function() {
+                /*  供父组件调用，清空上传的文件.  */
+                //更新组件的v-model的值
+                this.$emit('_change', null);
+                !this.auto && (this.uploadConfig.isStartUpload = false);
+                this.text = '';
             }
+        },
+        model: {
+            prop: 'value',
+            event: '_change'
         },
         components: {
             FileUploader: FileUploader

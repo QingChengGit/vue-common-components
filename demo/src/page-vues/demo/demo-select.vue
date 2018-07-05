@@ -1,20 +1,26 @@
 <template>
-    <div class="page-select">
-        <p class="explain-text">下拉框:</p>
+    <div class="page-demo-select page-padding">
+        <div class="title-page">下拉框组件</div>
         <yunnex-select :source-data="selectData" :select-title="selectTitle" v-model="selectValue"
                        @select-change="handleSelectChange">
         </yunnex-select>
         <p class="explain-text">带搜索功能的下拉框:</p>
         <yunnex-select :source-data="selectData" :is-show-search="true" :select-title="selectTitle"
                        :search-placeholder="'请输入搜索关键词'" v-model="searchSelectValue"></yunnex-select>
+        <p class="explain-text">自定义外观宽度的下拉框:</p>
+        <yunnex-select :source-data="selectData" :is-show-search="true" :select-title="selectTitle"
+                       :search-placeholder="'请输入搜索关键词'" :appearance-width="150"
+                       v-model="searchSelectValue"></yunnex-select>
         <p class="explain-text">禁用的下拉框:</p>
         <yunnex-select :source-data="selectData" :select-title="selectTitle" :disabled="true"></yunnex-select>
     </div>
 </template>
 
 <style lang="less">
-    .page-select {
-        padding: 20px 20px;
+    .page-demo-select {
+        .title-page {
+            margin-bottom: 20px;
+        }
         .explain-text {
             color: #676a6c;
             margin: 20px 0;
@@ -23,7 +29,8 @@
 </style>
 
 <script>
-    var select = require('common/components/yunnex-select/index'),
+    var commCss = require('common/styles/common'),
+        select = require('common/components/yunnex-select/index'),
         datas = [
             {id: '01', text: 'vue'},
             {id: '02', text: 'react', selected: true},

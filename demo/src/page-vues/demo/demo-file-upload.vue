@@ -1,5 +1,6 @@
 <template>
-    <div class="page-file-upload">
+    <div class="page-demo-file-upload page-padding">
+        <div class="title-page">文件上传组件</div>
         <div class="baseinfo-config-item">
                 <span class="config-item-left">
                     <span class="require-symbol">*</span>
@@ -7,9 +8,9 @@
                 </span>
             <div :class="!validateInfo.isSelectLogo ? 'invalid-btn' : 'uploader-btn-wrap'">
                 <yunnex-uploader :upload-config="logoFileUploaderConfig" @upload-complete="handleLogoUploadResult"
-                          @file-input="validateLogoFile"></yunnex-uploader>
+                          @file-input="validateLogoFile" v-model="logoRes" ref="logoChild"></yunnex-uploader>
                 <span class="upload-file-name" v-show="uploadLogoName">{{'已上传：' + uploadLogoName}}</span>
-                <div class="upload-btn" @click="uploadFile">上传</div>
+                <div class="yunnex-btn" @click="clearFile">清空</div>
             </div>
             <div class="tip-message">图片尺寸为大于500*500px的正方形，且小于1M，支持格式：jpg、jpeg、png、bmp</div>
         </div>
@@ -22,6 +23,7 @@
                 <yunnex-uploader :upload-config="coverFileUploaderConfig" @upload-complete="handleCoverUploadResult"
                           @file-input="validateCoverFile"></yunnex-uploader>
                 <span class="upload-file-name" v-show="uploadCoverName">{{'已上传：' + uploadCoverName}}</span>
+                <div class="yunnex-btn upload-btn" @click="uploadFile">上传</div>
             </div>
             <div class="tip-message">
                 图片尺寸为大于1020*643px，不得有圆角，不得拉伸变形，且小于2M，支持格式：jpg、jpeg、png、bmp
@@ -32,8 +34,10 @@
 </template>
 
 <style lang="less">
-    .page-file-upload {
-        padding: 20px 0;
+    .page-demo-file-upload {
+        .title-page {
+            margin-bottom: 20px;
+        }
         .baseinfo-config-item {
             margin-bottom: 42px;
             &:last-child {
@@ -49,9 +53,6 @@
             width: 96px;
             text-align: left;
             vertical-align: middle;
-        }
-        .yunnex-uploader-component {
-            line-height: 30px;
         }
         .upload-file-name {
             margin-left: 8px;
@@ -79,7 +80,8 @@
 </style>
 
 <script>
-    var yunnexUploader = require('common/components/uploader/index'),
+    var commCss = require('common/styles/common'),
+        yunnexUploader = require('common/components/uploader/index'),
         yunnexDialog = require('common/components/dialog/index'),
         util = require('common/js/util');
 
@@ -90,7 +92,7 @@
 
     module.exports = {
         data: function() {
-            var uploadBackendUrl = '/saofu-shop-card/customer/config/sendImageToAlipay';
+            var uploadBackendUrl = '/user-web-admin/upload';
 
             return {
                 conf: {
@@ -110,7 +112,7 @@
                     文件上传组件可选项配置对象:
                     {
                         //设置在选择要上传文件后是否自动上传文件
-                        auto: boolean， 可选
+                        auto: boolean， default: true,可选
                         //设置文件上传的后端接口地址
                         backendUrl: string, 必填
                         //多个扩展名之间以逗号隔开比如'png,jpg',默认为'jpg,jpeg,bmp,png'
@@ -132,18 +134,20 @@
                  */
                 logoFileUploaderConfig: {
                     maxSize: 1024 * 1024,
-                    backendUrl: uploadBackendUrl,
-                    auto: true,
-                    isStartUpload: false
+                    backendUrl: uploadBackendUrl
+                    //auto: true
                 },
                 coverFileUploaderConfig: {
                     maxSize: 2 * 1024 * 1024,
-                    backendUrl: uploadBackendUrl
+                    backendUrl: uploadBackendUrl,
+                    auto: false,
+                    isStartUpload: false
                 },
                 validateInfo: {
                     isSelectLogo: true,
                     isSelectCover: true
-                }
+                },
+                logoRes: null
             };
         },
         methods: {
@@ -191,12 +195,6 @@
                         dialogIcon: 'icon-err',
                         dialogMessage: '请上传合适的图片格式，支持格式：jpg、jpeg、png、bmp，且小于2M'
                     });
-                }else {
-                    openDialog(self, {
-                        dialogType: 'msgBox',
-                        dialogIcon: 'icon-tip',
-                        dialogMessage: '文件上传中，请耐心等待...'
-                    });
                 }
             },
             handleCoverUploadResult: function(res, file) {
@@ -217,6 +215,20 @@
                     conf.dialogMessage = '上传封面图失败:' + res.message;
                 }
                 openDialog(self, conf);
+            },
+            uploadFile: function() {
+                //设置是否开始上传文件
+                this.coverFileUploaderConfig.isStartUpload = true;
+                openDialog(this, {
+                    dialogType: 'msgBox',
+                    dialogIcon: 'icon-tip',
+                    dialogMessage: '文件上传中，请耐心等待...'
+                });
+            },
+            clearFile: function() {
+                console.log(this.logoRes);
+                this.$refs.logoChild.clear();
+                console.log(this.logoRes);
             }
         },
         components: {

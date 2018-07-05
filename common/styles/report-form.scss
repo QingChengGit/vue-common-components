@@ -1,0 +1,73 @@
+//报表类页面公共样式
+@import "common/styles/yunnex-input-data-item.scss";
+@import "common/styles/variable";
+.report-form-style {
+    .statistic-summary {
+        padding: 18px 0;
+        margin: 40px 0;
+        border: $border;
+        font-size: 0;
+        .statistic-item {
+            display: inline-block;
+            padding: 12px 0 12px 28px;
+            border-right: $border;
+            color: $color_333;
+            vertical-align: top;
+        }
+        .statistic-item-text {
+            font-size: 14px;
+        }
+        .statistic-item-val {
+            margin-top: 24px;
+            font-size: 26px;
+        }
+    }
+    .tab-box {
+        margin: 40px 0;
+    }
+    .query-condition-area {
+        position: relative;
+        margin-top: 40px;
+        font-size: 0;
+    }
+    .split-line {
+        display: inline-block;
+        width: 0;
+        height: 18px;
+        margin-left: 20px;
+        border-left: 1px solid #d7d7d7;
+        font-size: 0;
+        vertical-align: middle;
+    }
+    .yunnex-button-group {
+        margin-left: 20px;
+    }
+    .query-operate-btns-wrap {
+        position: absolute;
+        right: 0;
+        top: 0;
+    }
+    .export-btn {
+        margin-left: 10px;
+    }
+    .green-text {
+        font-size: 13px;
+        color: #1ab394;
+    }
+    .yunnex-input-data-item {
+        display: inline-block;
+        margin-right: 40px;
+        margin-bottom: 20px;
+        vertical-align: top;
+    }
+    .yunnex-middle-input {
+        width: 200px;
+    }
+    .yunnex-tip-component {
+        line-height: 1;
+        vertical-align: middle;
+    }
+    .pagination-component {
+        margin: 20px 0 75px;
+    }
+}

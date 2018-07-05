@@ -1,11 +1,12 @@
 <template>
-    <div class="page-form-validate">
+    <div class="page-demo-form-validate page-padding">
+        <div class="title-page">表单校验插件</div>
         <input class="yunnex-input" type="text" name="username" v-model="username"
                validate-rule="required;len:5" validate-message="请输入用户名,长度为5位!" />
-        <!-- 如果校验项不是form类型的表单，也即不能通过value属性来获取该标签的值的情况下,需要设置data-value属性为
-            该标签待待校验的值-->
+        <!-- 如果校验项不是form类型的表单，也即不能通过value属性来获取该标签的值的情况下,需要设置data-value-path属性为
+            该标签待校验的值路径，如：data-value-path="a.b"则会将context.a.b的值作为该校验项的value值 -->
         <yunnex-select name="langType" :source-data="typeList" :select-title="selectTitle" v-model="selectType"
-                       validate-rule="required" validate-message="请选择类型!" :data-value="selectType">
+                       validate-rule="required" validate-message="请选择类型!" data-value-path="selectType">
         </yunnex-select>
         <!-- 通过设置custom-rule属性设置自定义校验函数名 -->
         <input class="yunnex-input" type="text" name="pwd" v-model="password" custom-rule="checkPassword"
@@ -20,8 +21,10 @@
 </template>
 
 <style lang="less">
-    .page-form-validate {
-        padding: 20px 20px;
+    .page-demo-form-validate {
+        .title-page {
+            margin-bottom: 20px;
+        }
         .yunnex-btn {
             display: inline-block;
         }

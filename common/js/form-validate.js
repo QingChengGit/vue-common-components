@@ -3,18 +3,30 @@
  */
 var validateStrategy = {
     required: function(val) {
-        if(typeof val === 'undefined' || !val.trim().length) {
+        return !isEmpty(val);
+    },
+    len: function(val, l) {
+        if(isEmpty(val) || val.toString().trim().length != l) {
             return false;
         }
         return true;
     },
-    len: function(val, l) {
-        if(typeof val === 'undefined' || val.toString().trim().length != l) {
+    minLen: function(val, l) {
+        return !isEmpty(val) && val.toString().length >= l;
+    },
+    maxLen: function(val, l) {
+        if(!isEmpty(val) && val.toString().length > l){
             return false;
         }
         return true;
     }
 };
+function isEmpty(val) {
+    if(val === null || typeof val == 'undefined' || !val.toString().trim()) {
+        return true;
+    }
+    return false;
+}
 function FormValidate(ctx) {
     this.context = ctx || null;
     this.validateRuleArr = [];
@@ -22,29 +34,63 @@ function FormValidate(ctx) {
 }
 
 FormValidate.prototype.init = function init(el) {
-    var element = (typeof el === 'string' ? document.querySelector(el) : el),
-        rules,
+    var element = (typeof el === 'string' ? document.querySelectorAll(el) : el),
+        validateRule,
+        rules = [],
         customRules,
+        customArr = [],
         self = this;
 
     if(!element) {
         return;
     }
-    rules = element.querySelectorAll('[validate-rule]');
-    rules = Array.prototype.slice.call(rules);
+    if("length" in element) {
+        element = Array.prototype.slice.call(element);
+        element.forEach(function(item, idx) {
+            validateRule = element[idx].querySelectorAll('[validate-rule]');
+            if(validateRule) {
+                rules = rules.concat(Array.prototype.slice.call(validateRule));
+            }
+        });
+    }else {
+        validateRule = element.querySelectorAll('[validate-rule]');
+        rules && (rules = Array.prototype.slice.call(validateRule));
+    }
     rules.forEach(function(item, index) {
+        customArr = [];
         rules = item.getAttribute('validate-rule');
+        rules = rules ? rules.split(';') : [];
         customRules = item.getAttribute('custom-rule');
-        customRules = customRules ? self.context[customRules] : [];
-        if(!customRules) {
-            throw new Error('can not find ' + item.getAttribute('custom-rule') + ' definition at give context');
-        }
+        customRules = customRules ? customRules.split(';') : [];
+        customRules.forEach(function(t) {
+            if(!self.context[t]) {
+                throw new Error('can not find ' + item.getAttribute('custom-rule') + ' definition at give context');
+            }else {
+                customArr.push(self.context[t]);
+            }
+        });
         self.validateRuleArr.push({
             name: item.getAttribute('name'),
-            rules: rules.split(';').concat(customRules),
+            rules: rules.concat(customArr),
             getValue: (function(element) {
                 return function() {
-                    return "value" in element ? element.value : element.getAttribute('data-value');
+                    var t,
+                        v;
+
+                    if("value" in element) {
+                        return element.value;
+                    }
+                    t = element.getAttribute('data-value-path');
+                    if(t) {
+                        //路径之间用.分隔
+                        t = t.split('.');
+                        v = self.context;
+                        t.forEach(function(_t) {
+                            v = v[_t];
+                        });
+                        return v;
+                    }
+                    return null;
                 };
             })(item),
             message: item.getAttribute('validate-message').split(';')

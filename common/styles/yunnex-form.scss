@@ -1,0 +1,166 @@
+
+@import "common.scss";
+
+$main-color: #1ab394;
+$width-color: #fff;
+$red-color: #f04134;
+$border-color: #d7d7d7;
+
+
+.fl {
+    float: left
+}
+.fr {
+    float: right
+}
+.cf:after{
+    content: " ";
+    visibility: hidden;
+    display: block;
+    clear: both;
+    height: 0;
+    font-size: 0;
+}
+.cf {
+    clear: both;
+    zoom: 1;
+}
+
+
+/* 表单 */
+
+input[disabled],
+select[disabled],
+textarea[disabled] {
+    cursor: not-allowed;
+    background: #fbfbfb;
+} 
+
+.group-common-textarea {
+    width: 490px;
+    height: 122px;
+    overflow-y: auto;       
+    margin: 0;
+    padding: 0;
+}  
+
+.group-common-tips {
+    font-size: 13px;   
+    padding: 8px 0 0;
+    color: #999;
+}
+.group-init {
+    display: inline-block;        
+    line-height: 32px;  
+    padding: 0 10px;      
+    text-align: center;
+    border: 1px solid $border-color;
+    border-left: 0;   
+    background: #f2f2f2;  
+    font-size: 13px;
+}
+
+
+/* 表单列表 */
+
+.yunnex-form-group { 
+    
+    margin-bottom: 40px;   
+    
+    .group-title {
+        width: 133px;
+        padding-top: 7px;        
+    }  
+
+    .group-title-content {
+        display: inline-block;
+        width: 72px;       
+        vertical-align: middle;      
+        word-break: break-all;
+        font-size: 14px;
+        color: #333;          
+    }
+
+    .group-xing {
+        display: inline-block;
+        width: 0;
+        height: 100%;
+        color: $red-color; 
+        font-weight: bold;
+        vertical-align: top;
+    }
+
+    .group-title-mount {
+        display: block;
+        color: #999;
+        font-size: 12px;
+    }   
+  
+    .group-content {
+        width: 490px;
+    }
+
+    .group-content > * {
+        width: 100%;        
+    } 
+
+    .group-init-input {       
+        width: 435px;
+    } 
+
+    .group-init-input {
+        width: 442px;
+    }
+
+    .group-init-single {
+        width: 456px;
+    }  
+    
+    .group-middle-select,
+    .group-middle-input {
+        width: 242px;
+    }    
+
+}
+
+
+/* 表格表头 */
+
+.yunnex-form-table {
+
+    float: left;
+    width: auto;
+    margin: 0 30px 20px 0;
+
+    .group-title {
+        width: 100px;
+    }
+
+    .group-content {
+        width: 242px;
+    }
+
+    .group-content-table {
+        width: 412px;
+    }
+
+    .group-content-table .group-input-select {
+        width: 170px;
+    } 
+
+    .group-content-table .group-middle-input {
+        width: 242px;
+    }
+}
+
+.group-tips-err {
+    color: $red-color;
+}
+
+.group-input-err,
+.group-input-err:focus,
+.group-common-textarea.group-input-err,
+.group-common-textarea.group-input-err:focus {
+    border: 1px solid $red-color; 
+}
+

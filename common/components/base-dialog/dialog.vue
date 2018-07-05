@@ -3,7 +3,7 @@
         <div class="yunnex-dialog-mask">
         </div>
         <div class="yunnex-dialog" :class="dialogConfig.dialogClass">
-            <div :class="titleClass">
+            <div :class="titleClass" v-if="isNeedTitleArea">
                 {{title}}
                 <i v-if="dialogConfig.closeClass" class="dialog-close" :class="dialogConfig.closeClass" @click="closeDialog"></i>
             </div>
@@ -24,31 +24,37 @@
             z-index: 9999;
             width: 100%;
             height: 100%;
-            background-color: #666;
+            background-color: #000;
             opacity: 0.5;
+            -webkit-box-shadow: 0 4px 2px 4px #fcfcfc;
+            -moz-box-shadow: 0 4px 2px 4px #fcfcfc;
+            box-shadow: 0 4px 2px 4px #fcfcfc;
         }
         .yunnex-dialog {
             position: fixed;
             left: 50%;
             top: 50%;
             z-index: 10000;
-            border: 1px solid #1AB394;
-            -webkit-border-radius: 5px;
-            -moz-border-radius: 5px;
-            border-radius: 5px;
+            min-width: 320px;
+            -webkit-border-radius: 4px;
+            -moz-border-radius: 4px;
+            border-radius: 4px;
             -webkit-transform: translate(-50%, -50%);
             -moz-transform: translate(-50%, -50%);
             -ms-transform: translate(-50%, -50%);
             -o-transform: translate(-50%, -50%);
             transform: translate(-50%, -50%);
+            background-color: #fff;
             .yunnex-dialog-title {
                 position: relative;
-                height: 40px;
-                line-height: 40px;
-                padding-left: 14px;
-                font-size: 12px;
-                color: #fff;
-                background-color: #1AB394;
+                line-height: 1;
+                padding: 30px 0 30px 20px;
+                -webkit-border-radius: 4px;
+                -moz-border-radius: 4px;
+                border-radius: 4px;
+                font-size: 20px;
+                color: #333;
+                background-color: #fff;
             }
             .dialog-close {
                 position: absolute;
@@ -62,18 +68,10 @@
                 cursor: pointer;
             }
             .yunnex-dialog-content {
-                min-width: 400px;
                 min-height: 100px;
-                background-color: #fff;
+                max-height: 550px;
                 text-align: center;
-                &:after {
-                    content: '';
-                    display: inline-block;
-                    width: 0;
-                    height: 100%;
-                    font-size: 0;
-                    vertical-align: middle;
-                }
+                overflow-y: auto;
             }
         }
     }
@@ -85,6 +83,8 @@
             /*
                 @desc dialogConfig 对话框配置对象，可配置参数如下：
                 {
+                    // 是否需要顶部title区域，默认为true
+                    isNeedTitleArea: true,
                     //对换框标题文本,默认为"提示" [optional]
                     title: '提示',
                     //对话框整体样式class [optional]
@@ -108,6 +108,10 @@
             },
             title: function() {
                 return this.dialogConfig.title || '提示';
+            },
+            isNeedTitleArea: function() {
+                return typeof this.dialogConfig.isNeedTitleArea !== 'undefined' ? this.dialogConfig.isNeedTitleArea
+                    : true;
             }
         },
         methods: {

@@ -9,7 +9,7 @@
         <!-- 有下级菜单时,当前二级菜单不需要生成链接 -->
         <a class="menu-branch-a" v-if="!menu.subMenus || !menu.subMenus.length"
            :class="{'menu-branch-selected': menu.active, 'last-menu-branch-a': index === leftMenu.list.length - 1}"
-           :href="menu.url" :target="menu.target">
+           :href="menu.server + menu.url.split(';')[0]" :target="menu.target">
             <i class="fa" :class="menu.icon"></i>
             <span class="menu-branch-label">{{menu.name}}</span>
             <span class="new-menu-tip-span" v-if="menu.flag === 'new'">新</span>
@@ -23,7 +23,7 @@
         <ul v-if="menu.subMenus && menu.subMenus.length" class="js_second_menu_ul yunnex-left-second-menu-ul"
             :server="menu.subMenus.server">
             <li v-for="childMenu in menu.subMenus">
-                <a class="menu-leaf-a" :class="{'leaf-selected': childMenu.active}" :href="childMenu.url"
+                <a class="menu-leaf-a" :class="{'leaf-selected': childMenu.active}" :href="childMenu.server + childMenu.url.split(';')[0]"
                    :target="childMenu.target">
                     {{childMenu.name}}
                     <span v-if="childMenu.flag === 'new'" class="new-menu-tip-span">新</span>

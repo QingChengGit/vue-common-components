@@ -1,0 +1,4 @@
+.icon-hint-close { display: inline-block; width: 20px; height: 20px; background-image: url(../images/common/yunnex-hint-sprite.png); background-position: 0px 0px; }
+.icon-hint-status-error { display: inline-block; width: 20px; height: 20px; background-image: url(../images/common/yunnex-hint-sprite.png); background-position: -20px 0px; }
+.icon-hint-status-normal { display: inline-block; width: 20px; height: 20px; background-image: url(../images/common/yunnex-hint-sprite.png); background-position: 0px -20px; }
+.icon-hint-status-warn { display: inline-block; width: 20px; height: 20px; background-image: url(../images/common/yunnex-hint-sprite.png); background-position: -20px -20px; }

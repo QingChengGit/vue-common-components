@@ -1,17 +1,19 @@
 <template>
-    <div class="page-demo-dialog">
+    <div class="page-demo-dialog page-padding">
+        <p class="title-page">系统公共置弹框</p>
         <div class="yunnex-btn green-btn" @click="showAlertDialog">Alert框</div>
         <div class="yunnex-btn green-btn" @click="showConfirmDialog">Confirm框</div>
         <div class="yunnex-btn green-btn" @click="showAutoCloseDialog">AutoClose框</div>
         <div class="yunnex-btn green-btn" @click="showMsgBoxDialog">MsgBox框</div>
-        <yunnex-dialog :dialog-conf="conf" @close="closeDialogHandle"></yunnex-dialog>
+        <yunnex-dialog :dialog-conf="conf"></yunnex-dialog>
     </div>
 </template>
 
 <style lang="less">
     .page-demo-dialog {
-        padding-left: 20px;
-        margin-top: 20px;
+        .title-page {
+            margin-bottom: 20px;
+        }
         .yunnex-btn {
             display: inline-block;
         }
@@ -19,7 +21,8 @@
 </style>
 
 <script>
-    var yunnexDialog = require('common/components/dialog/index'),
+    var commCss = require('common/styles/common'),
+        yunnexDialog = require('common/components/dialog/index'),
         util = require('common/js/util');
 
     function openDialog(context, config) {
@@ -32,10 +35,12 @@
                 /*
                      对话框配置对象选项
                      dialogConf: {
+                     title: string, 可选，默认为“提示”
+                     当dialogType是以error开头则确定按钮会变成红色
                      dialogType: string [.*Alert|.*Confirm|autoClose|msgBox]任意一种, 必填
                      dialogMessage: string, 可选
                      //对话框上显示的图标class。比如显示一个成功、失败、错误的图标
-                     dialogIcon: string, 可选
+                     dialogIcon: string, 可选(系统现有值为success、error、tip、warn、confirm、busy)
                      //对话框窗右上角关闭按钮的class，如果不设置该选型则对话框右上角无关闭按钮
                      closeClass: string, 可选
                      okBtnText: string  默认为：确定,
@@ -43,7 +48,9 @@
                      //控制对话框的显示、关闭
                      isShow: boolean, 必填
                      //delayTime,对话框自动关闭的延时时间，如果对话框类型为autoClose才有效
-                     delayTime: number, 默认为2000毫秒
+                     delayTime: number, 默认为2000毫秒,
+                     //弹框关闭时触发的回调， 可选
+                     dialogCloseCb: fn
                  }
                  */
                 conf: {
@@ -71,7 +78,11 @@
                 openDialog(this, {
                     dialogType: 'tipConfirm',
                     dialogMessage: '我是一个Confirm提示消息!',
-                    dialogIcon: 'icon-error'
+                    dialogIcon: 'icon-confirm',
+                    dialogCloseCb: function(flag) {
+                        var txt = flag ? '确定按钮' : '取消或者关闭了弹框';
+                        alert('你点击了' + txt + '!');
+                    }
                 });
             },
             showAutoCloseDialog: function() {
@@ -95,24 +106,6 @@
                     config.isShow = false;
                     self.conf = config;
                 }, 2000);
-            },
-            closeDialogHandle: function(flag) {
-                //对话框关闭的时候触发的回调，如果点击了对话框的确定按钮则flag值为true
-                var o = {
-                    dialogType: 'autoClose',
-                    dialogMessage: '你点击了!',
-                    dialogIcon: 'icon-success',
-                    //默认2秒关闭
-                    delayTime: 1000
-                },
-                self = this;
-
-                if(flag) {
-                    o.dialogMessage += '确定按钮!';
-                }else {
-                    o.dialogMessage += '取消或者关闭按钮!';
-                }
-                openDialog(this, o);
             }
         }
     };

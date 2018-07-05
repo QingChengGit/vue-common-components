@@ -1,0 +1,35 @@
+@charset "UTF-8";
+/*
+    左边文字右边输入内容项结构的公共样式，该结构每一行(项)之间间距有两种情况，在表单区域每一项之间间距40px
+    在查询条件区域每一项之间间距20px，默认间距40px。
+    
+    如果在查询条件区域请大家自行设置下每项之间间距为20px!!
+ */
+.yunnex-input-data-item {
+    margin-bottom: 40px;
+    font-size: 0;
+    text-align: left;
+    .input-left-text, .input-right {
+        display: inline-block;
+        vertical-align: top;
+    }
+    .input-left-text {
+        width: 84px;
+        line-height: 1;
+        margin: 10px 10px 0 0;
+        font-size: 14px;
+        color: #333;
+        text-align: left;
+        -ms-word-wrap: break-word;
+        word-wrap: break-word;
+    }
+    .symbol-required {
+        display: inline-block;
+        font-size: 13px;
+        color: red;
+        vertical-align: middle;
+        &:after {
+            content: '*';
+        }
+    }
+}

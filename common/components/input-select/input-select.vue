@@ -1,16 +1,11 @@
 <template>
-<div class="yunnex-select-component">
-    <input type="text" class="search-input" :placeholder="searchPlaceholder" v-model="searchText"
-           @input="search" v-if="isShowSearch" @click="clickSelector"/>
-<!--    <div class="selected-text" :class="{'disabled': disabled, 'selected-text-active': isActive}"
-         @click="clickSelector">
-        {{selectedItem ? selectedItem[selectTitle.text] : ''}}
-        <i class="icon-select-arrow select-icon"></i>
-    </div>-->
-    <div class="select-item-wrap" v-show="isActive">
+<div class="yunnex-input-select-component">
+    <input type="text" class="yunnex-middle-input" :placeholder="searchPlaceholder" v-model="searchText"
+           @click="clickSelector" @input="search"/>
+    <div class="select-item-wrap" v-show="isActive && sourceData.length">
         <ul class="option-container" @click="selectItem">
             <li class="option-item" :class="{'option-item-selected': selectedItem &&
-                selectedItem[selectTitle.name] === item[selectTitle.name]}" v-for="item in selectData"
+                selectedItem[selectTitle.name] === item[selectTitle.name]}" v-for="item in sourceData"
                 :option-id="item[selectTitle.name]">{{item[selectTitle.text]}}</li>
         </ul>
         <div v-show="false" :data-tmp="setSelectedItem"></div>
@@ -19,34 +14,15 @@
 </template>
 
 <style lang="less">
-.yunnex-select-component {
+.yunnex-input-select-component {
     position: relative;
     display: inline-block;
-    width: 220px;
-    font-size: 14px;
+    width: 242px;
+    font-size: 13px;
+    color: #333;
     vertical-align: middle;
-    .selected-text {
-        position: relative;
-        height: 30px;
-        line-height: 30px;
-        padding-left: 10px;
-        border: 1px solid #ccc;
-        color: #555;
-        cursor: pointer;
-    }
-    .selected-text-active {
-        border-color: #1ab394;
-        border-bottom: none;
-    }
-    .select-icon {
-        position: absolute;
-        right: 10px;
-        top: 50%;
-        -webkit-transform: translate(0, -50%);
-        -moz-transform: translate(0, -50%);
-        -ms-transform: translate(0, -50%);
-        -o-transform: translate(0, -50%);
-        transform: translate(0, -50%);
+    input.yunnex-middle-input {
+        width: 100%;
     }
     .disabled {
         color: #c3cbd6;
@@ -55,30 +31,34 @@
     .select-item-wrap {
         position: absolute;
         left: 0;
-        top: 30px;
+        top: 34px;
+        min-width: 242px;
+        max-width: 420px;
         width: 100%;
         z-index: 1000;
-        border: 1px solid #1ab394;
-        border-top: none;
-        background-color: #fff;
-    }
-    .search-input {
-        height: 30px;
         padding: 0 10px;
-        margin: 6px 10px;
+        border: 1px solid #d7d7d7;
+        background-color: #fff;
+        -webkit-box-shadow: 0 4px 2px 4px #fcfcfc;
+        -moz-box-shadow: 0 4px 2px 4px #fcfcfc;
+        box-shadow: 0 4px 2px 4px #fcfcfc;
     }
     .option-container {
         height: 150px;
+        margin: 0 -10px;
         overflow-y: scroll;
+        &:hover .option-item {
+            color: #333;
+            background-color: #fff;
+        }
     }
     .option-item {
-        min-height: 30px;
-        line-height: 30px;
-        padding: 0 10px;
+        line-height: 20px;
+        padding: 7px 10px 7px 16px;
         word-wrap: break-word;
         white-space: normal;
         cursor: pointer;
-        &:hover {
+        &:hover.option-item {
             color: #fff;
             background-color: #1ab394;
         }
@@ -91,14 +71,15 @@
 </style>
 
 <script>
-    var sprite = require('common/styles/yunnex-select-sprite.css');
+    var DeferPerform = require('common/js/defer-perform'),
+        defer,
+        sprite = require('common/styles/yunnex-select-sprite.css');
 
     module.exports = {
         data: function() {
             return {
                 searchText: '',
                 selectedItem: null,
-                selectData: [],
                 isActive: false
             };
         },
@@ -110,10 +91,6 @@
             sourceData: {
                 type: Array,
                 required: true
-            },
-            isShowSearch: {
-                type: Boolean,
-                default: false
             },
             searchPlaceholder: {
                 type: String
@@ -128,7 +105,11 @@
                 var self = this,
                     text = this.searchText.trim();
 
-                self.$emit('input', text);
+	            if(!text) {
+		            self.$emit('input', {});
+	            }
+	            defer.pushData('search-text-change', text);
+	            self.selectedItem = null;
             },
             selectItem: function(evt) {
                 var target = evt.target,
@@ -144,48 +125,39 @@
                 if(self.selectedItem && self.selectedItem[self.selectTitle.name] == id) {
                     return;
                 }
-                self.selectData.some(function(item, index) {
+                self.sourceData.some(function(item, index) {
                     if(item[self.selectTitle.name] == id){
                         self.selectedItem = item;
                         self.searchText = item[self.selectTitle.text];
-                        self.$emit('input', item[self.selectTitle.name]);
+                        self.$emit('input', item);
                         self.$emit('select-change', item, index);
                         return true;
                     }
                 });
+            },
+            emitEvt: function(evt, arg) {
+                this.$emit(evt, arg);
             },
             clickSelector: function() {
                 if(this.disabled) {
                     return;
                 }
                 this.isActive = !this.isActive;
-                this.isActive && (this.selectData = this.sourceData.concat([]));
             },
             closeSelect: function(evt) {
                 var target = evt.target;
 
                 if(!this.$el.contains(target)) {
-                    //this.searchText = '';
+                	if(!this.selectedItem) {
+		                this.searchText = '';
+                    }
                     this.isActive = false;
                 }
             }
         },
-        computed: {
-            setSelectedItem: function() {
-                var self = this;
-
-                self.sourceData.some(function(item) {
-                    if(item.selected) {
-                        self.selectedItem = item;
-                        self.$emit('input', item[self.selectTitle.name]);
-                        //self.$emit('select-change', item);
-                        return true;
-                    }
-                });
-            }
-        },
         mounted: function() {
             document.body.addEventListener('click', this.closeSelect, false);
+	        defer = new DeferPerform(this.emitEvt, 1000, this);
         },
         beforeDestroy: function() {
             document.body.removeEventListener('click', this.closeSelect, false);

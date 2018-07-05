@@ -77,16 +77,13 @@ function jsonp(url, opts, fn){
   }
 
   window[id] = function(data){
-    console.log('jsonp got', data);
     cleanup();
     if (fn) fn(null, data);
   };
 
   // add qs component
   url += (~url.indexOf('?') ? '&' : '?') + param + '=' + enc(id);
-  url = url.replace('?&', '?');
-
-  console.log('jsonp req "%s"', url);
+  url = url.replace('?&', '?') + '&_=' + (new Date()).getTime();
 
   // create script
   script = document.createElement('script');

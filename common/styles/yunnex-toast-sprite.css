@@ -1,0 +1,4 @@
+.icon-toast-status-error { display: inline-block; width: 58px; height: 58px; background-image: url(../images/common/yunnex-toast-sprite.png); background-position: 0px 0px; }
+.icon-toast-status-success { display: inline-block; width: 58px; height: 58px; background-image: url(../images/common/yunnex-toast-sprite.png); background-position: -58px 0px; }
+.icon-toast-status-wait { display: inline-block; width: 58px; height: 58px; background-image: url(../images/common/yunnex-toast-sprite.png); background-position: 0px -58px; }
+.icon-toast-status-warn { display: inline-block; width: 58px; height: 58px; background-image: url(../images/common/yunnex-toast-sprite.png); background-position: -58px -58px; }

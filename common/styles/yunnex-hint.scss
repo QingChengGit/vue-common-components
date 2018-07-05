@@ -1,0 +1,75 @@
+.yunnex-hint-wrap {
+	width: 1044px;
+	overflow: hidden;
+	border-radius: 2px;
+	opacity: 1;
+
+	.hint-status {
+		display: block;
+		float: left;
+		width: 20px;
+		height: 20px;
+	    margin: 9px;
+	}
+	.hint-text-wrap {
+		display: block;
+	    float: left;
+	    width: 964px;
+	    padding: 4px 6px;
+
+	    .hint-text {
+	    	display: block;
+	        line-height: 30px;
+	        font-size: 13px;
+
+	        .hint-link {
+	        	color: #1ab394;
+	        	cursor: pointer;
+	        	text-decoration: none;
+
+	        	&:hover {
+	        		text-decoration: underline;
+	        	}
+	        	&:active {
+	        		color: #1ab394;
+	        	}
+	        }
+	    }
+	}
+	.hint-close {
+		display: block;
+		float: left;
+		width: 20px;
+		height: 20px;
+	    margin: 9px;
+	    background: url('../images/icons/yunnex-hint/hint-close.png') no-repeat;
+		cursor: pointer;
+	}
+}
+.hint-normal {
+	border: 1px solid #d8fff7;
+	color: #3d6b62;
+	background: #e7fffa;
+
+	.hint-status {
+		background: url('../images/icons/yunnex-hint/hint-status-normal.png') no-repeat;
+	}
+}
+.hint-warn {
+	border: 1px solid #fcf0d6;
+	color: #a18655;
+	background: #fff7e6;
+
+	.hint-status {
+		background: url('../images/icons/yunnex-hint/hint-status-warn.png') no-repeat;
+	}
+}
+.hint-error {
+	border: 1px solid #ffd2d2;
+	color: #b8746f;
+	background: #ffe3e3;
+
+	.hint-status {
+		background: url('../images/icons/yunnex-hint/hint-status-error.png') no-repeat;
+	}
+}

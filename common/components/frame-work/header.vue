@@ -13,14 +13,13 @@
                                 <li class="user-info-item">
                                     <div class="dropdown profile-element">
                                         <span>
-                                            <img class="img-circle" :src="userInfo.shop.logoUrl">
+                                            <img class="img-circle" :src="userInfo.shop.headImg">
                                         </span>
                                         <!-- 商户总部登录时 -->
-                                        <a class="user-information" :href="userInfo.shopInfoUrl">
+                                        <a class="user-information" :href="userInfo.shopInfoUrl + '/syscfg/shanghu/show'">
                                             <span class="clear">
                                                 <div class="user-tel">{{userInfo.shop.account}}</div>
-                                                <div class="user-detail-name">深圳云移-集成</div>
-                                                <span class="user-detail-name"></span>
+                                                <div class="user-detail-name">{{userInfo.shop.name}}</div>
                                             </span>
                                         </a>
                                     </div>
@@ -56,21 +55,22 @@
                 </a>
 
                 <!--商户概况(商户登陆才会显示该链接)-->
-                <a class="top-area-item" target="_blank" href="/saofu-shop-shop/common/asynexport-record">
+                <a class="top-area-item" target="_blank" :href="domainName + '/saofu-shop-shop/common/asynexport-record'">
                     <i class="icon-export"></i>
                     <span class="top-item-text">导出结果</span>
                 </a>
-                <a class="top-area-item" href="#" v-if="userInfo.hasPackageExpire">
+                <a class="top-area-item message-center" :href="userInfo.shopInfoUrl + '/shop_message/shop_message_list'"
+                   target="_blank" v-if="isShop && userInfo.hasPackageExpire">
                     <i class="icon-message"></i>
-                    <span class="top-item-text unread-message">
-                        {{unreadMessageCount}}
+                    <span class="top-item-text unread-message" v-if="userInfo.unreadMessageCount">
+                        {{userInfo.unreadMessageCount}}
                     </span>
                     <span class="top-item-text">消息中心</span>
                 </a>
-                <a class="top-area-item j-help-center" href="javascript:void(0);">
+                <a class="top-area-item j-help-center" href="javascript:void(0);" @click="showCustomerServicePop">
                     <span class="top-item-text">帮助中心</span>
                 </a>
-                <a class="top-area-item" :class="{'last-top-area-item': isShop}" href="/saofu-shop-shop/switch">
+                <a class="top-area-item" :class="{'last-top-area-item': isShop}" :href="domainName + '/saofu-shop-shop/switch'">
                     <span class="top-item-text">切换旧版菜单</span>
                 </a>
                 <a class="top-area-item last-top-area-item" v-if="!isShop" @click="logout"
@@ -83,7 +83,7 @@
         <nav class="navbar-static-top">
             <div class="navbar-static-top-wrap">
                 <div class="navbar-header">
-                    <a class="logo" :style="{background: 'url(\'' + userInfo.shop.logoUrl + '\')no-repeat'}">掌贝 顾客大数据.智能营销平台</a>
+                    <a class="logo" :style="{background: 'url(\'' + userInfo.logoUrl + '\')no-repeat'}">掌贝 顾客大数据.智能营销平台</a>
                 </div>
                 <ul class="navbar-right">
                     <li @click="jumpPage">
@@ -94,8 +94,25 @@
                         </div>
                     </li>
                 </ul>
+                <!--  功能目录入口  -->
+                <div v-if="isShowFunctionDirectory" class="function-directory">
+                    <span class="tag function-btn" @click="functionDirectoryLink">功能目录</span>
+                </div>
             </div>
         </nav>
+        <!-- 客服系统弹框 -->
+        <div class="service-pop-wrap" v-show="isShowCustomerServicePop">
+            <div class="service-mask"></div>
+            <div class="service-pop">
+                <h2 class="service-title">掌贝客服系统</h2>
+                <a class="btn-contact-us" href="javascript:void(0);" @click="goUserCustomerService">
+                    <span class="contact-us-icon"></span>在线咨询</a>
+                <!--<#if Session.supportPhone != null>
+                    <p>或致电 ${Session.supportDesk}：${Session.supportPhone}</p>
+                </#if>-->
+                <span class="btn-close-service" @click="closeCustomerServicePop">×</span>
+            </div>
+        </div>
     </div>
 </template>
 
@@ -144,13 +161,20 @@
             font-size: 12px;
             vertical-align: middle;
         }
+        .message-center {
+            position: relative;
+        }
         .unread-message {
             position: absolute;
             top: 2px;
             right: -20px;
             line-height: 1;
-            font-size: 10px;
+            padding: 3px 8px;
+            -webkit-border-radius: 5px;
+            -moz-border-radius: 5px;
             border-radius: 5px;
+            font-size: 10px;
+            font-weight: 500;
             color: #fff;
             background-color: #e60012;
         }
@@ -203,6 +227,7 @@
         .user-tel {
             line-height: 1;
             margin: 0;
+            font-weight: 600;
             color: #333;
         }
         .user-detail-name {
@@ -252,10 +277,27 @@
             background-color: #fff;
         }
         .navbar-static-top-wrap {
+            position: relative;
             width: 1318px;
             margin: 0 auto;
             font-size: 0;
             white-space: nowrap;
+        }
+        .function-directory {
+            position: absolute;
+            right: 0;
+            top: 50%;
+            transform: translate(0, -50%);
+            .function-btn {
+                color: #1AB394;
+                font-size: 16px;
+                border-color: #1ab394;
+                cursor: pointer;
+                &:hover {
+                    background-color: #1ab394;
+                    color: #fff;
+                }
+            }
         }
         .navbar-header, .navbar-right {
             position: static;
@@ -304,6 +346,97 @@
             margin: 10px 10px 0 0;
             cursor: default;
         }
+        .service-pop-wrap {
+            .service-mask{
+                position: fixed;
+                top: 0;
+                left: 0;
+                z-index: 10001;
+                width: 100%;
+                height: 100%;
+                background-color: #000;
+                filter: alpha(opacity=60);
+                background: rgba(0, 0, 0, .6);
+            }
+            .service-pop {
+                position: fixed;
+                top: 50%;
+                left: 50%;
+                z-index: 10002;
+                width: 400px;
+                overflow: hidden;
+                margin: -220px 0 0 -200px;
+                font: normal 18px/20px 'Microsoft YaHei';
+                color: #fff;
+                text-align: center;
+                background-color: #fff;
+                border-radius: 10px;
+            }
+            .service-title{
+                width: 100%;
+                height: 240px;
+                padding-top: 190px;
+                margin: 0;
+                font: normal 18px/20px 'Microsoft YaHei';
+                background: #42a9f7 url('../../images/common/service.png') no-repeat center 43px;
+            }
+            .btn-contact-us {
+                display: block;
+                width: 265px;
+                height: 50px;
+                margin: 35px auto;
+                text-align: center;
+                color: #fff;
+                line-height: 50px;
+                text-decoration: none;
+                background-color: #42a9f7;
+                border-radius: 25px;
+                -webkit-transition: all .12s linear;
+                -moz-transition: all .12s linear;
+                -ms-transition: all .12s linear;
+                transition: all .12s linear;
+            }
+            .btn-contact-us:hover, .btn-contact-us:focus{
+                text-decoration: none;
+                color: #fff;
+                background-color: #1a95ef;
+            }
+            .contact-us-icon {
+                position: relative;
+                top: 4px;
+                display: inline-block;
+                width: 21px;
+                height: 21px;
+                margin-right: 8px;
+                background: url('../../images/common/icon_service.png') no-repeat 0 -86px;
+            }
+            .service-pop p {
+                margin-bottom: 60px;
+                color: #42a9f7;
+            }
+            .btn-close-service {
+                position: absolute;
+                top: 20px;
+                right: 20px;
+                display: block;
+                width: 16px;
+                height: 16px;
+                color: #fff;
+                font: normal 24px/16px 'Microsoft YaHei';
+                cursor: pointer;
+                -webkit-transition: all .12s linear;
+                -moz-transition: all .12s linear;
+                -ms-transition: all .12s linear;
+                transition: all .12s linear;
+            }
+            .btn-close-service:hover {
+                -webkit-transform:translateY(-2px);
+                -moz-transform:translateY(-2px);
+                -ms-transform:translateY(-2px);
+                transform:translateY(-2px);
+                color: #e3effb;
+            }
+        }
     }
 </style>
 
@@ -313,7 +446,12 @@
         axios = require('libs/axios-proxy');
 
     module.exports = {
-        data: function() {},
+        data: function() {
+        	return {
+				isShowCustomerServicePop: false,
+                isShowFunctionDirectory: false
+            };
+        },
         props: {
             menuList: {
                 type: Array,
@@ -322,6 +460,9 @@
             userInfo: {
                 type: Object,
                 required: true
+            },
+	        domainName: {
+            	type: String
             }
         },
         computed: {
@@ -344,8 +485,11 @@
                 return rs;
             },
             isShop: function() {
-                return !this.userInfo.isShopBranch && !this.userInfo.shopSubGroup;
+                return !this.userInfo.shopBranch && !this.userInfo.shopSubGroup;
             }
+        },
+        mounted () {
+            this.getShowFunctionDirectory();
         },
         methods: {
             showUserInfoDetail: function() {
@@ -358,10 +502,7 @@
                 var target = evt.target,
                     uri = target.getAttribute('menu-uri');
 
-                    //uri = util.getUrlInfo(uri).pathname;
-                    //分离之后可能就不需要去除path中的ctx了 TODO
-                    uri = util.getUrlInfo(uri).pathname.replace(/\/[^\/]+(\/[^\/]+?.*)/, '$1');
-                    localStorage.setItem('curURI', uri);
+                    localStorage.setItem('curURI', util.getUrlInfo(uri).pathname.replace(/\/[^\/]+(\/[^\/]+?.*)/, '$1'));
                     if (target.getAttribute('target') === '_blank') {
                         window.open(uri);
                     } else {
@@ -370,17 +511,44 @@
             },
             logout: function() {
                 var self = this,
+                    domain = self.domainName || '',
                     response;
 
-                axios.post('/saofu-shop-shop/logout', {}).then(function(res) {
+                axios.post(domain + '/saofu-shop-shop/logout', {}).then(function(res) {
                     response = res.data;
                     if(response.success){
-                        window.location.href = '/login/html/index/login.html';
+                        window.location.href = '/shpt-frontend/login/html/index/login.html';
                     }else{
                         console.log('调用退出登录接口失败:' + response.message);
                     }
                 });
+            },
+			showCustomerServicePop: function() {
+				this.isShowCustomerServicePop = true;
+            },
+			closeCustomerServicePop: function() {
+            	this.isShowCustomerServicePop = false;
+            },
+			goUserCustomerService: function() {
+				this.isShowCustomerServicePop = false;
+				window.open('https://yunnex.qiyukf.com/client?k=12e245a5ec4db1934e3835a673bb4965&wp=1&' +
+                    'gid=408357&robotShuntSwitch=1', '联系我们', 'width=800,height=600,top=50,toolbar=no,' +
+                    'menubar=no,scrollbars=no, resizable=no,location=no, status=no');
+            },
+            // 请求是否显示功能目录入口
+            getShowFunctionDirectory () {
+                let _this = this;
+                axios.get('/saofu-shop-shop/shopFunction/isShowShopFunction')
+                    .then(res => {
+                        if (res.data.code === '0') {
+                            _this.isShowFunctionDirectory = res.data.attach;
+                        }
+                    })
+            },
+            functionDirectoryLink () {
+                location.href = "/shpt-frontend/saofu-shop-shop/html/visualization/functional-directory.html";
             }
+
         }
     };
 </script>

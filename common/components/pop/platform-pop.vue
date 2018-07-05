@@ -1,6 +1,6 @@
 <template>
     <pop :dialog-config="dialogConfig">
-        <div slot="dialog-content">
+        <div slot="dialog-content" class="pop-content-wrap">
             <slot name="pop-content">
             </slot>
         </div>
@@ -8,12 +8,11 @@
 </template>
 
 <style lang="less">
-    /*.pop-title {
-        padding: 12px 0 12px 10px;
-        font-size: 12px;
-        color: #fff;
-        background-color: #1ab394;
-    }*/
+    .yunnex-dialog-container {
+        .pop-content-wrap {
+            margin: 0 20px;
+        }
+    }
 </style>
 
 <script>
@@ -28,7 +27,6 @@
         },
         created: function() {
             //this.dialogConfig.titleClass = 'pop-title';
-            this.dialogConfig.closeClass = 'icon-popup-close-white';
         },
         components: {
             pop: pop

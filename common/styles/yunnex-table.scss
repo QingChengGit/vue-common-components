@@ -1,0 +1,64 @@
+.yunnex-table {
+    width: 100%;
+    table-layout: fixed;
+    border-collapse: collapse;
+    border: 1px solid #d7d7d7;
+    font-size: 13px;
+    color: #333;
+    thead {
+        background-color: #f2f2f2;
+        th {
+            height: 60px;
+            padding: 11px 12px;
+            line-height: 18px;
+            word-break: break-all;
+            border: 1px solid #d7d7d7;
+            box-sizing: border-box;
+            text-align: left;
+            font-weight: bolder;
+        }
+    }
+    .yunnex-thead {
+        tr {
+            th {
+                height: 35px;
+            }
+            .column-item {
+                text-align: center;
+            }
+        }
+    }
+    tbody {
+        tr {
+            &:hover {
+                background-color: #fcfcfc;
+            }
+            td {
+                height: 60px;
+                padding: 0 12px;
+                border: 1px solid #d7d7d7;
+                line-height: 18px;
+                word-break: break-all;
+            }
+            .empty {
+                padding: 156px 0 30px;
+                background: url(../images/icons/yunnex-table/ghost.png) center 39px no-repeat;
+                text-align: center;
+                color: #b2b2b2;
+                font-size: 12px;
+            }
+        }
+        .common-item-belong {
+            td {
+                background-color: #fcfcfc;
+            }
+        }
+    }
+    .yunnex-tbody {
+        tr {
+            td {
+                height: 80px;
+            }
+        }
+    }
+}
