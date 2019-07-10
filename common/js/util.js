@@ -187,18 +187,70 @@ util.formatDateNew = function formatDateNew(date, mode, dateSplitStr, timeSplitS
 	return rs;
 };
 util.downLoadByLink = function downLoadByLink(url) {
+	//如果提供filename，则filename需要包含扩展名
 	var link,
-		evt;
+		xhr,
+		extension;
 	
 	link = document.createElement('a');
 	link.href = url;
-	if(document.fireEvent) {
-		window.open(link.href);
-	}else {
-		evt = document.createEvent('MouseEvents');
-		evt.initEvent('click', true, true);
-		link.dispatchEvent(evt);
+	extension = url.replace(/.*?\.([^.\/]+$)/, '$1');
+	if(link.host !== location.host && /jpg|png|jpeg|gif|bmp/.test(extension)) {
+		//说明要下载的是跨域图片
+		downLoadCrossImg(url, filename);
+		link = null;
+		return;
 	}
+	xhr = new XMLHttpRequest();
+	xhr.open('GET', url, true);
+	xhr.responseType = 'blob';
+	xhr.onload = function() {
+		if (xhr.status === 200) {
+			saveAs(xhr.response, filename);
+		}
+	};
+	xhr.send();
+};
+function saveAs(blob, filename) {
+	if (window.navigator.msSaveOrOpenBlob) {
+		navigator.msSaveBlob(blob, filename);
+	} else {
+		var link = document.createElement('a');
+		var body = document.querySelector('body');
+		
+		link.href = window.URL.createObjectURL(blob);
+		link.download = filename;
+		
+		// fix Firefox
+		link.style.display = 'none';
+		body.appendChild(link);
+		
+		link.click();
+		body.removeChild(link);
+		
+		window.URL.revokeObjectURL(link.href);
+	}
+}
+const downLoadCrossImg = (url, filename) =>{
+	var canvas = document.createElement('canvas');
+	var img = document.createElement('img');
+	img.onload = function(e) {
+		canvas.width = img.width;
+		canvas.height = img.height;
+		var context = canvas.getContext('2d');
+		context.drawImage(img, 0, 0, img.width, img.height);
+		// window.navigator.msSaveBlob(canvas.msToBlob(),'image.jpg');
+		// saveAs(imageDataUrl, '附件');
+		canvas.getContext('2d').drawImage(img, 0, 0, img.width, img.height);
+		canvas.toBlob((blob)=>{
+			let link = document.createElement('a');
+			link.href = window.URL.createObjectURL(blob);
+			link.download = filename || url.replace(/.*?([^\/]+\.[^.\/]+$)/, '$1');
+			link.click();
+		}, "image/jpeg");
+	};
+	img.setAttribute("crossOrigin",'Anonymous');
+	img.src = url;
 };
 /*
     鉴于js的浮点型数字计算会出现精度问题，加以下方法。
