@@ -190,11 +190,18 @@ util.downLoadByLink = function downLoadByLink(url) {
 	//如果提供filename，则filename需要包含扩展名
 	var link,
 		xhr,
+		reg = /.*?\.([^.\/]+)$/,
 		extension;
 	
 	link = document.createElement('a');
 	link.href = url;
-	extension = url.replace(/.*?\.([^.\/]+$)/, '$1');
+	extension = url.replace(reg, '$1');
+	if(!reg.test(url)) {
+		//说明url的资源的请求，即资源并非资源的真实路径
+		saveAsLink(url, filename);
+		link = null;
+		return;
+	}
 	if(link.host !== location.host && /jpg|png|jpeg|gif|bmp/.test(extension)) {
 		//说明要下载的是跨域图片
 		downLoadCrossImg(url, filename);
@@ -206,12 +213,27 @@ util.downLoadByLink = function downLoadByLink(url) {
 	xhr.responseType = 'blob';
 	xhr.onload = function() {
 		if (xhr.status === 200) {
-			saveAs(xhr.response, filename);
+			saveAsBlob(xhr.response, filename);
 		}
 	};
 	xhr.send();
 };
-function saveAs(blob, filename) {
+function saveAsLink(url, fileName) {
+	var link,
+		evt;
+	
+	link = document.createElement('a');
+	link.href = url;
+	link.download = fileName;
+	if(document.fireEvent) {
+		window.open(link.href);
+	}else {
+		evt = document.createEvent('MouseEvents');
+		evt.initEvent('click', true, true);
+		link.dispatchEvent(evt);
+	}
+}
+function saveAsBlob(blob, filename) {
 	if (window.navigator.msSaveOrOpenBlob) {
 		navigator.msSaveBlob(blob, filename);
 	} else {
